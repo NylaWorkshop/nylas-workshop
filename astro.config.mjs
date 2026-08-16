@@ -6,6 +6,13 @@ import tailwindcss from '@tailwindcss/vite';
 // site: 'https://TU_USUARIO.github.io',
 // base: '/nylas-workshop',
 export default defineConfig({
+  i18n: {
+    defaultLocale: "es",
+    locales: ["es", "en"],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

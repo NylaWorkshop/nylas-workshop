@@ -1,0 +1,56 @@
+---
+import { localizePath, stripLocale, useTranslations } from "../i18n/utils";
+import type { Lang } from "../i18n/ui";
+
+const lang = (Astro.currentLocale ?? "es") as Lang;
+const t = useTranslations(lang);
+const pagePath = stripLocale(Astro.url.pathname);
+const hash = Astro.url.hash;
+const esHref = `${localizePath("es", pagePath)}${hash}`;
+const enHref = `${localizePath("en", pagePath)}${hash}`;
+---
+
+<div class="flex items-center gap-2" role="group" aria-label={t("lang.label")}>
+  <a
+    href={esHref}
+    hreflang="es"
+    lang="es"
+    data-lang="es"
+    class="lang-btn"
+    aria-label={t("lang.es")}
+    aria-current={lang === "es" ? "true" : undefined}
+    title={t("lang.es")}
+  >
+    <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="60" height="40" fill="#c60b1e"></rect>
+      <rect y="10" width="60" height="20" fill="#ffc400"></rect>
+    </svg>
+  </a>
+  <a
+    href={enHref}
+    hreflang="en-GB"
+    lang="en-GB"
+    data-lang="en"
+    class="lang-btn"
+    aria-label={t("lang.en")}
+    aria-current={lang === "en" ? "true" : undefined}
+    title={t("lang.en")}
+  >
+    <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="60" height="40" fill="#012169"></rect>
+      <path d="M0 0 L60 40 M60 0 L0 40" stroke="#fff" stroke-width="8"></path>
+      <path d="M0 0 L60 40 M60 0 L0 40" stroke="#c8102e" stroke-width="5"></path>
+      <path d="M30 0 V40 M0 20 H60" stroke="#fff" stroke-width="14"></path>
+      <path d="M30 0 V40 M0 20 H60" stroke="#c8102e" stroke-width="8"></path>
+    </svg>
+  </a>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLAnchorElement>("[data-lang]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const next = link.dataset.lang;
+      if (next) localStorage.setItem("nyla-lang", next);
+    });
+  });
+</script>

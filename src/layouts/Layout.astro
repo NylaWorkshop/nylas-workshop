@@ -2,22 +2,27 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import type { Lang } from '../i18n/ui';
+import { localizePath, stripLocale } from '../i18n/utils';
 
 interface Props {
   title?: string;
   description?: string;
 }
 
+const lang = (Astro.currentLocale ?? "es") as Lang;
+const pagePath = stripLocale(Astro.url.pathname);
 const {
   title = "Nyla's Workshop",
   description = "Taller de una gata programadora y gamedev. Juegos, código, libros y café.",
 } = Astro.props;
 
 const pageTitle = title === "Nyla's Workshop" ? title : `${title} · Nyla's Workshop`;
+const htmlLang = lang === "en" ? "en-GB" : "es";
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={htmlLang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,9 +33,13 @@ const pageTitle = title === "Nyla's Workshop" ? title : `${title} · Nyla's Work
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/logo.png" />
+    <meta property="og:locale" content={lang === "en" ? "en_GB" : "es_ES"} />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="alternate" hreflang="es" href={localizePath("es", pagePath)} />
+    <link rel="alternate" hreflang="en-GB" href={localizePath("en", pagePath)} />
+    <link rel="alternate" hreflang="x-default" href={localizePath("es", pagePath)} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -1,0 +1,48 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import GameCard from "../../components/GameCard.astro";
+import { useTranslations } from "../../i18n/utils";
+
+const t = useTranslations(Astro.currentLocale);
+
+const games = [
+  {
+    id: "wireghost",
+    title: "Wireghost",
+    tag: t("games.wireghost.tag"),
+    status: t("games.wireghost.status"),
+    description: t("games.wireghost.desc"),
+  },
+  {
+    id: "cuaderno",
+    title: t("games.notebook.title"),
+    tag: t("games.notebook.tag"),
+    status: t("games.notebook.status"),
+    description: t("games.notebook.desc"),
+  },
+];
+---
+
+<Layout title={t("meta.gamesTitle")} description={t("meta.gamesDesc")}>
+  <section class="mx-auto max-w-6xl px-5 pb-10 pt-14">
+    <p class="banner-title">{t("games.kicker")}</p>
+    <h1 class="font-display gold-text mt-3 text-3xl md:text-4xl">{t("games.title")}</h1>
+    <p class="mt-4 max-w-2xl text-base text-muted">
+      {t("games.lead")}
+    </p>
+  </section>
+
+  <section class="mx-auto grid max-w-6xl gap-6 px-5 md:grid-cols-2">
+    {games.map((game) => (
+      <div id={game.id}>
+        <GameCard
+          title={game.title}
+          tag={game.tag}
+          status={game.status}
+          description={game.description}
+          featured={game.id === "wireghost"}
+        />
+      </div>
+    ))}
+  </section>
+</Layout>

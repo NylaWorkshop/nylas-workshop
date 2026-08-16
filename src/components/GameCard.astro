@@ -6,37 +6,51 @@ interface Props {
   description: string;
   href?: string;
   featured?: boolean;
+  cta?: string;
 }
 
-const { title, tag, status, description, href, featured = false } = Astro.props;
-const Wrapper = href ? "a" : "article";
+const { title, tag, status, description, href, featured = false, cta } = Astro.props;
+
+const frameClass = [
+  "card-frame group block rounded-3xl p-6 transition duration-300",
+  featured && "md:p-8",
+  href && "cursor-pointer",
+];
 ---
 
-<Wrapper
-  href={href}
-  class:list={[
-    "card-frame group block rounded-3xl p-6 transition duration-300",
-    featured && "md:p-8",
-    href && "cursor-pointer",
-  ]}
->
-  <div class="mb-5 flex items-center justify-between gap-3">
-    <span class="font-display text-[0.68rem] uppercase tracking-[0.32em] text-gold">{tag}</span>
-    <span class="rounded-full border border-gold/25 px-3 py-1 text-[0.65rem] uppercase tracking-[0.18em] text-gold-soft">
-      {status}
-    </span>
-  </div>
-
-  <h3 class:list={["font-display gold-text leading-tight", featured ? "text-3xl" : "text-2xl"]}>
-    {title}
-  </h3>
-  <p class:list={["mt-4 max-w-xl text-muted", featured ? "text-base" : "text-sm"]}>
-    {description}
-  </p>
-
-  {href && (
-    <p class="mt-6 font-display text-[0.68rem] uppercase tracking-[0.28em] text-gold transition group-hover:text-gold-soft">
-      Entrar al expediente →
+{href ? (
+  <a href={href} class:list={frameClass}>
+    <div class="mb-5 flex items-center justify-between gap-3">
+      <span class="font-display text-[0.68rem] uppercase tracking-[0.32em] text-gold">{tag}</span>
+      <span class="rounded-full border border-gold/25 px-3 py-1 text-[0.65rem] uppercase tracking-[0.18em] text-gold-soft">
+        {status}
+      </span>
+    </div>
+    <h3 class:list={["font-display gold-text leading-tight", featured ? "text-2xl" : "text-xl"]}>
+      {title}
+    </h3>
+    <p class:list={["mt-4 max-w-xl text-muted", featured ? "text-base" : "text-sm"]}>
+      {description}
     </p>
-  )}
-</Wrapper>
+    {cta && (
+      <p class="mt-6 font-display text-[0.68rem] uppercase tracking-[0.28em] text-gold transition group-hover:text-gold-soft">
+        {cta}
+      </p>
+    )}
+  </a>
+) : (
+  <article class:list={frameClass}>
+    <div class="mb-5 flex items-center justify-between gap-3">
+      <span class="font-display text-[0.68rem] uppercase tracking-[0.32em] text-gold">{tag}</span>
+      <span class="rounded-full border border-gold/25 px-3 py-1 text-[0.65rem] uppercase tracking-[0.18em] text-gold-soft">
+        {status}
+      </span>
+    </div>
+    <h3 class:list={["font-display gold-text leading-tight", featured ? "text-2xl" : "text-xl"]}>
+      {title}
+    </h3>
+    <p class:list={["mt-4 max-w-xl text-muted", featured ? "text-base" : "text-sm"]}>
+      {description}
+    </p>
+  </article>
+)}

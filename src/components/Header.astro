@@ -1,60 +1,70 @@
 ---
-const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+import LangSwitch from "./LangSwitch.astro";
+import type { Lang } from "../i18n/ui";
+import { localizePath, stripLocale, useTranslations } from "../i18n/utils";
+
+const lang = (Astro.currentLocale ?? "es") as Lang;
+const t = useTranslations(lang);
+const path = stripLocale(Astro.url.pathname);
 
 const links = [
-  { href: "/", label: "Inicio" },
-  { href: "/games", label: "Juegos" },
-  { href: "/merch", label: "Merch" },
+  { href: localizePath(lang, "/"), page: "/", label: t("nav.home") },
+  { href: localizePath(lang, "/games"), page: "/games", label: t("nav.games") },
+  { href: localizePath(lang, "/merch"), page: "/merch", label: t("nav.merch") },
 ];
 ---
 
 <header class="sticky top-0 z-40 border-b border-gold/15 bg-ink/80 backdrop-blur-md">
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
-    <a href="/" class="group flex items-center gap-3">
+    <a href={localizePath(lang, "/")} class="group flex items-center gap-3">
       <img
         src="/logo.png"
         alt="Nyla's Workshop"
         class="h-12 w-12 rounded-full object-cover ring-1 ring-gold/35 transition group-hover:ring-gold/70"
       />
       <span class="leading-tight">
-        <span class="font-display block text-[1.05rem] gold-text">Nyla's</span>
+        <span class="font-display block text-[1.05rem] tracking-[0.04em] gold-text">Nyla's</span>
         <span class="block text-[0.62rem] uppercase tracking-[0.38em] text-gold/80">Workshop</span>
       </span>
     </a>
 
-    <nav class="hidden items-center gap-7 md:flex" aria-label="Principal">
-      {links.map((link) => {
-        const active = path === link.href || (link.href !== "/" && path.startsWith(link.href));
-        return (
-          <a
-            href={link.href}
-            class:list={[
-              "font-display text-[0.72rem] uppercase tracking-[0.28em] transition",
-              active ? "text-gold" : "text-paper/75 hover:text-gold-soft",
-            ]}
-            aria-current={active ? "page" : undefined}
-          >
-            {link.label}
-          </a>
-        );
-      })}
-    </nav>
+    <div class="flex items-center gap-4">
+      <nav class="hidden items-center gap-7 md:flex" aria-label={t("nav.main")}>
+        {links.map((link) => {
+          const active = path === link.page || (link.page !== "/" && path.startsWith(link.page));
+          return (
+            <a
+              href={link.href}
+              class:list={[
+                "font-display text-[0.72rem] uppercase tracking-[0.28em] transition",
+                active ? "text-gold" : "text-paper/75 hover:text-gold-soft",
+              ]}
+              aria-current={active ? "page" : undefined}
+            >
+              {link.label}
+            </a>
+          );
+        })}
+      </nav>
 
-    <button
-      id="nav-toggle"
-      class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/25 text-gold md:hidden"
-      aria-expanded="false"
-      aria-controls="mobile-nav"
-      type="button"
-    >
-      <span class="sr-only">Abrir menú</span>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" />
-      </svg>
-    </button>
+      <LangSwitch />
+
+      <button
+        id="nav-toggle"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/25 text-gold md:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        type="button"
+      >
+        <span class="sr-only">{t("nav.open")}</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" />
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <nav id="mobile-nav" class="hidden border-t border-gold/10 px-5 py-4 md:hidden" aria-label="Móvil">
+  <nav id="mobile-nav" class="hidden border-t border-gold/10 px-5 py-4 md:hidden" aria-label={t("nav.mobile")}>
     <div class="flex flex-col gap-3">
       {links.map((link) => (
         <a

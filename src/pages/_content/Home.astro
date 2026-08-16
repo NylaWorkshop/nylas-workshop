@@ -1,0 +1,118 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import GameCard from "../../components/GameCard.astro";
+import type { Lang } from "../../i18n/ui";
+import { localizePath, useTranslations } from "../../i18n/utils";
+
+const lang = (Astro.currentLocale ?? "es") as Lang;
+const t = useTranslations(lang);
+
+const pillars = [
+  { mark: "✦", title: t("home.pillar.stories"), text: t("home.pillar.storiesText") },
+  { mark: "▣", title: t("home.pillar.games"), text: t("home.pillar.gamesText") },
+  { mark: "</>", title: t("home.pillar.code"), text: t("home.pillar.codeText") },
+];
+---
+
+<Layout title={t("meta.homeTitle")} description={t("meta.homeDesc")}>
+  <section class="moon-glow relative overflow-hidden">
+    <div class="mx-auto grid max-w-6xl items-center gap-8 px-5 pb-10 pt-8 md:grid-cols-[1fr_0.9fr] md:gap-12 md:pb-12 md:pt-12">
+      <div class="order-2 text-center md:order-1 md:text-left">
+        <p class="banner-title justify-center md:justify-start">{t("home.kicker")}</p>
+        <h1 class="font-display gold-text mt-5 max-w-xl text-[1.85rem] leading-[1.15] sm:text-[2.15rem] md:text-[2.35rem]">
+          {t("home.title")}
+        </h1>
+        <p class="mt-5 max-w-lg text-base text-paper/90 md:text-[1.05rem]">
+          {t("home.lead")}
+        </p>
+        <p class="mt-3 max-w-lg text-sm leading-relaxed text-muted md:text-[0.95rem]">
+          {t("home.sub")}
+        </p>
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+          <a
+            href={localizePath(lang, "/games")}
+            class="rounded-full bg-gold px-6 py-3 font-display text-[0.68rem] uppercase tracking-[0.28em] text-ink transition hover:bg-gold-soft"
+          >
+            {t("home.ctaGames")}
+          </a>
+          <a
+            href={localizePath(lang, "/merch")}
+            class="rounded-full border border-gold/35 px-6 py-3 font-display text-[0.68rem] uppercase tracking-[0.28em] text-gold transition hover:border-gold hover:text-gold-soft"
+          >
+            {t("home.ctaMerch")}
+          </a>
+        </div>
+      </div>
+
+      <div class="order-1 flex justify-center md:order-2">
+        <div class="relative">
+          <div class="absolute inset-8 rounded-full bg-[radial-gradient(circle,rgba(245,240,230,0.2),transparent_68%)] blur-2xl"></div>
+          <img
+            src="/logo.png"
+            alt={t("home.logoAlt")}
+            class="relative w-[min(26rem,86vw)] drop-shadow-[0_0_40px_rgba(232,201,122,0.18)]"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-5 pt-10 md:pt-16">
+    <div class="mb-10 flex flex-col items-center text-center">
+      <div class="flourish">
+        <span class="flourish-line"></span>
+        <h2 class="font-display gold-text text-2xl tracking-[0.18em] uppercase md:text-3xl">
+          {t("home.workshop")}
+        </h2>
+        <span class="flourish-line"></span>
+      </div>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">
+      {pillars.map((pillar) => (
+        <article class="card-frame rounded-2xl px-5 py-5">
+          <p class="font-display text-lg text-gold">{pillar.mark}</p>
+          <h2 class="font-display mt-3 text-lg text-cream">{pillar.title}</h2>
+          <p class="mt-2 text-sm leading-relaxed text-muted">{pillar.text}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-5 pt-10 md:pt-16">
+    <div class="mb-10 flex flex-col items-center text-center">
+      <div class="flourish">
+        <span class="flourish-line"></span>
+        <h2 class="font-display gold-text text-2xl tracking-[0.18em] uppercase md:text-3xl">
+          {t("home.table")}
+        </h2>
+        <span class="flourish-line"></span>
+      </div>
+      <p class="font-display mt-4 text-xl text-cream md:text-[1.35rem]">
+        {t("home.forging")}
+      </p>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">
+      <GameCard
+        href={`${localizePath(lang, "/games")}#cuaderno`}
+        title={t("home.table.storiesTitle")}
+        tag={t("home.table.storiesTag")}
+        status={t("home.table.storiesStatus")}
+        description={t("home.table.storiesDesc")}
+      />
+      <GameCard
+        href={`${localizePath(lang, "/games")}#wireghost`}
+        title="Wireghost"
+        tag={t("home.wireghostTag")}
+        status={t("home.wireghostStatus")}
+        description={t("home.wireghostDesc")}
+      />
+      <GameCard
+        href={localizePath(lang, "/merch")}
+        title={t("home.table.merchTitle")}
+        tag={t("home.table.merchTag")}
+        status={t("home.table.merchStatus")}
+        description={t("home.table.merchDesc")}
+      />
+    </div>
+  </section>
+</Layout>
