@@ -54,7 +54,7 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: 0;
-  opacity: 0.45;
+  opacity: 0.4;
   background-image:
     radial-gradient(1.2px 1.2px at 8% 18%, var(--gold-soft), transparent),
     radial-gradient(1px 1px at 22% 42%, var(--cream), transparent),
@@ -64,6 +64,19 @@ body::before {
     radial-gradient(1px 1px at 93% 78%, var(--gold), transparent),
     radial-gradient(1.3px 1.3px at 16% 88%, var(--cream), transparent),
     radial-gradient(1px 1px at 58% 92%, var(--gold-soft), transparent);
+}
+
+body::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.22;
+  background-image: url("/bg-astral.svg"), url("/bg-astral.svg");
+  background-repeat: no-repeat;
+  background-position: 108% -18%, -28% 112%;
+  background-size: min(92vw, 58rem), min(70vw, 40rem);
 }
 
 ::selection {
@@ -140,10 +153,29 @@ a {
     0 18px 40px rgba(0, 0, 0, 0.32);
 }
 
-.moon-glow {
+.moon-wash {
+  position: relative;
   background:
-    radial-gradient(circle at 50% 42%, rgba(245, 240, 230, 0.16), transparent 42%),
-    radial-gradient(circle at 50% 48%, rgba(232, 201, 122, 0.12), transparent 58%);
+    radial-gradient(ellipse 80% 70% at 74% 12%, rgba(245, 240, 230, 0.16), transparent 56%),
+    radial-gradient(ellipse 70% 62% at 28% 18%, rgba(232, 201, 122, 0.11), transparent 60%),
+    radial-gradient(ellipse 100% 55% at 50% 0%, rgba(232, 201, 122, 0.06), transparent 72%);
+}
+
+.moon-wash > * {
+  position: relative;
+  z-index: 1;
+}
+
+.moon-wash::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  height: min(20rem, 42%);
+  background: linear-gradient(180deg, transparent, var(--bg) 90%);
 }
 
 .site-shell {
