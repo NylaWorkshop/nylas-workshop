@@ -1,0 +1,33 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-20 border-t border-gold/15">
+  <div class="mx-auto max-w-6xl px-5 py-10">
+    <div class="flourish mb-6">
+      <span class="flourish-line"></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <circle cx="6.8" cy="10.2" r="2.05"></circle>
+        <circle cx="12" cy="8.4" r="2.05"></circle>
+        <circle cx="17.2" cy="10.2" r="2.05"></circle>
+        <circle cx="9.2" cy="5.7" r="1.55"></circle>
+        <circle cx="14.8" cy="5.7" r="1.55"></circle>
+        <ellipse cx="12" cy="16.6" rx="5.2" ry="3.4"></ellipse>
+      </svg>
+      <span class="flourish-line"></span>
+    </div>
+
+    <div class="flex flex-col items-center gap-3 text-center">
+      <p class="font-display text-sm tracking-[0.22em] text-gold">Nyla's Workshop</p>
+      <p class="max-w-md text-sm text-muted">
+        Hecho con café, código y una pizca de magia en el taller de una gata programadora.
+      </p>
+      <nav class="mt-2 flex flex-wrap justify-center gap-5 text-[0.7rem] uppercase tracking-[0.24em] text-paper/70">
+        <a class="hover:text-gold" href="/">Inicio</a>
+        <a class="hover:text-gold" href="/games">Juegos</a>
+        <a class="hover:text-gold" href="/merch">Merch</a>
+      </nav>
+      <p class="mt-4 text-xs text-muted/80">© {year} Nyla's Workshop</p>
+    </div>
+  </div>
+</footer>
