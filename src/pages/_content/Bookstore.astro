@@ -1,0 +1,100 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CharacterEntry from "../../components/CharacterEntry.astro";
+import Filigree from "../../components/Filigree.astro";
+import type { Lang } from "../../i18n/ui";
+import { useTranslations } from "../../i18n/utils";
+import { characters, localizeCharacter } from "../../data/characters";
+
+const lang = (Astro.currentLocale ?? "es") as Lang;
+const t = useTranslations(lang);
+const roster = characters.map((character) => localizeCharacter(character, lang));
+
+const story = [
+  t("bookstore.p1"),
+  t("bookstore.p2"),
+  t("bookstore.p3"),
+  t("bookstore.p4"),
+  t("bookstore.p5"),
+];
+---
+
+<Layout title={t("meta.bookstoreTitle")} description={t("meta.bookstoreDesc")}>
+  <section class="mx-auto max-w-6xl px-5 pb-8 pt-14">
+    <div class="mb-10 flex flex-col items-center text-center">
+      <div class="flourish">
+        <span class="flourish-line"></span>
+        <h1 class="font-display gold-text text-2xl tracking-[0.18em] uppercase md:text-3xl">
+          {t("bookstore.about")}
+        </h1>
+        <span class="flourish-line"></span>
+      </div>
+    </div>
+
+    <figure class="shop-frame">
+      <img src="/bookstore/nylas_bookstore.png" alt={t("bookstore.imageAlt")} />
+    </figure>
+
+    <div class="story-panel">
+      <Filigree />
+      <div class="shop-story">
+        <h2 class="font-display gold-text text-[1.55rem] leading-tight md:text-[1.85rem]">
+          {t("bookstore.headline")}
+        </h2>
+        {story.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+        <p class="text-paper/95">
+          {t("bookstore.p6")}
+        </p>
+        <p class="font-display mt-8 text-gold">{t("bookstore.welcome1")}</p>
+        <p class="font-display text-gold">{t("bookstore.welcome2")}</p>
+      </div>
+      <Filigree flip />
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-5 pt-10 md:pt-16">
+    <div class="mb-12 flex flex-col items-center text-center">
+      <div class="flourish">
+        <span class="flourish-line"></span>
+        <h2 class="font-display gold-text text-2xl tracking-[0.18em] uppercase md:text-3xl">
+          {t("bookstore.staff")}
+        </h2>
+        <span class="flourish-line"></span>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-14 md:gap-20">
+      {roster.map((character, index) => (
+        <CharacterEntry
+          name={character.name}
+          role={character.role}
+          paragraphs={character.paragraphs}
+          image={character.image}
+          accent={character.accent}
+          index={index}
+        />
+      ))}
+    </div>
+
+    <div class="story-panel mt-16 md:mt-24">
+      <Filigree />
+      <div class="shop-story">
+        <h2 class="font-display gold-text text-[1.55rem] leading-tight md:text-[1.85rem]">
+          {t("bookstore.closeTitle")}
+        </h2>
+        <p>{t("bookstore.close1")}</p>
+        <p>{t("bookstore.close2")}</p>
+        <p>{t("bookstore.close3")}</p>
+        <p>{t("bookstore.close4")}</p>
+        <p class="font-display gold-text mt-6 text-[1.15rem] leading-snug md:text-[1.25rem]">{t("bookstore.close5")}</p>
+      </div>
+      <Filigree flip />
+    </div>
+
+    <figure class="shop-frame shop-frame-staff mt-10">
+      <img src="/bookstore/final_staff.png" alt={t("bookstore.closeImageAlt")} />
+    </figure>
+  </section>
+</Layout>

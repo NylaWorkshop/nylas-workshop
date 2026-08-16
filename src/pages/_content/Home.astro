@@ -1,6 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import GameCard from "../../components/GameCard.astro";
 import type { Lang } from "../../i18n/ui";
 import { localizePath, useTranslations } from "../../i18n/utils";
 
@@ -78,7 +77,7 @@ const pillars = [
     </div>
   </section>
 
-  <section class="mx-auto max-w-6xl px-5 pt-10 md:pt-16">
+  <section class="mx-auto max-w-6xl px-5 pt-16 md:pt-24">
     <div class="mb-10 flex flex-col items-center text-center">
       <div class="flourish">
         <span class="flourish-line"></span>
@@ -91,28 +90,37 @@ const pillars = [
         {t("home.forging")}
       </p>
     </div>
-    <div class="grid gap-4 md:grid-cols-3">
-      <GameCard
-        href={`${localizePath(lang, "/games")}#cuaderno`}
-        title={t("home.table.storiesTitle")}
-        tag={t("home.table.storiesTag")}
-        status={t("home.table.storiesStatus")}
-        description={t("home.table.storiesDesc")}
-      />
-      <GameCard
-        href={`${localizePath(lang, "/games")}#wireghost`}
-        title="Wireghost"
-        tag={t("home.wireghostTag")}
-        status={t("home.wireghostStatus")}
-        description={t("home.wireghostDesc")}
-      />
-      <GameCard
-        href={localizePath(lang, "/merch")}
-        title={t("home.table.merchTitle")}
-        tag={t("home.table.merchTag")}
-        status={t("home.table.merchStatus")}
-        description={t("home.table.merchDesc")}
-      />
+
+    <div class="workbench">
+      <a class="dossier" href={`${localizePath(lang, "/games")}#wireghost`}>
+        <div>
+          <span class="dossier-tab">{t("home.wireghostTag")}</span>
+          <h3 class="font-display gold-text text-2xl">Wireghost</h3>
+          <p class="mt-3 max-w-md text-sm leading-relaxed text-muted">
+            {t("home.wireghostDesc")}
+          </p>
+        </div>
+        <p class="mt-8 font-display text-[0.65rem] uppercase tracking-[0.24em] text-gold">
+          {t("home.wireghostStatus")}
+        </p>
+      </a>
+
+      <div class="slip-stack">
+        <a class="slip-note" href={`${localizePath(lang, "/games")}#cuaderno`}>
+          <p class="font-display text-[0.62rem] uppercase tracking-[0.28em] text-gold/80">
+            {t("home.table.storiesTag")} · {t("home.table.storiesStatus")}
+          </p>
+          <h3 class="font-display mt-2 text-lg text-cream">{t("home.table.storiesTitle")}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-muted">{t("home.table.storiesDesc")}</p>
+        </a>
+        <a class="slip-ticket" href={localizePath(lang, "/merch")}>
+          <p class="font-display text-[0.62rem] uppercase tracking-[0.28em] text-gold/80">
+            {t("home.table.merchTag")} · {t("home.table.merchStatus")}
+          </p>
+          <h3 class="font-display mt-2 text-lg text-cream">{t("home.table.merchTitle")}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-muted">{t("home.table.merchDesc")}</p>
+        </a>
+      </div>
     </div>
   </section>
 </Layout>

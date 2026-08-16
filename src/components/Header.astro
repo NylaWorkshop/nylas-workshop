@@ -9,6 +9,7 @@ const path = stripLocale(Astro.url.pathname);
 
 const links = [
   { href: localizePath(lang, "/"), page: "/", label: t("nav.home") },
+  { href: localizePath(lang, "/bookstore"), page: "/bookstore", label: t("nav.bookstore") },
   { href: localizePath(lang, "/games"), page: "/games", label: t("nav.games") },
   { href: localizePath(lang, "/merch"), page: "/merch", label: t("nav.merch") },
 ];

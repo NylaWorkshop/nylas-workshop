@@ -1,0 +1,38 @@
+---
+interface Props {
+  name: string;
+  role: string;
+  paragraphs: string[];
+  image: string;
+  accent: string;
+  index: number;
+}
+
+const { name, role, paragraphs, image, accent, index } = Astro.props;
+const flipped = index % 2 === 1;
+
+function emphasize(text: string) {
+  return text.split(/\*\*(.+?)\*\*/g);
+}
+---
+
+<article
+  id={name.toLowerCase()}
+  class:list={["folio", flipped && "folio-flip"]}
+  style={`--folio-accent: ${accent}`}
+>
+  <div class="folio-art">
+    <img src={image} alt={`${name} — ${role}`} />
+  </div>
+  <div class="folio-copy">
+    <p class="font-display text-[0.62rem] uppercase tracking-[0.32em] text-gold/80">
+      {role}
+    </p>
+    <h2 class="font-display gold-text mt-3 text-3xl md:text-4xl">{name}</h2>
+    {paragraphs.map((paragraph) => (
+      <p class="mt-4 text-sm leading-relaxed text-muted">
+        {emphasize(paragraph).map((part, i) => (i % 2 ? <strong class="text-paper/95">{part}</strong> : part))}
+      </p>
+    ))}
+  </div>
+</article>
