@@ -10,27 +10,47 @@ const path = stripLocale(Astro.url.pathname);
 const links = [
   { href: localizePath(lang, "/"), page: "/", label: t("nav.home") },
   { href: localizePath(lang, "/bookstore"), page: "/bookstore", label: t("nav.bookstore") },
+  { href: localizePath(lang, "/music"), page: "/music", label: t("nav.music") },
   { href: localizePath(lang, "/games"), page: "/games", label: t("nav.games") },
   { href: localizePath(lang, "/merch"), page: "/merch", label: t("nav.merch") },
 ];
+
+const xProfile = "https://x.com/NylaKatsuki";
 ---
 
 <header class="sticky top-0 z-40 border-b border-gold/15 bg-ink/80 backdrop-blur-md">
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
-    <a href={localizePath(lang, "/")} class="group flex items-center gap-3">
-      <img
-        src="/logo.png"
-        alt="Nyla's Workshop"
-        class="h-12 w-12 rounded-full object-cover ring-1 ring-gold/35 transition group-hover:ring-gold/70"
-      />
-      <span class="leading-tight">
-        <span class="font-display block text-[1.05rem] tracking-[0.04em] gold-text">Nyla's</span>
-        <span class="block text-[0.62rem] uppercase tracking-[0.38em] text-gold/80">Workshop</span>
-      </span>
-    </a>
+    <div class="flex min-w-0 items-center gap-3 sm:gap-4">
+      <a href={localizePath(lang, "/")} class="group flex items-center gap-3">
+        <img
+          src="/logo.png"
+          alt="Nyla's Workshop"
+          class="h-12 w-12 rounded-full object-cover ring-1 ring-gold/35 transition group-hover:ring-gold/70"
+        />
+        <span class="leading-tight">
+          <span class="font-display block text-[1.05rem] tracking-[0.04em] gold-text">Nyla's</span>
+          <span class="block text-[0.62rem] uppercase tracking-[0.38em] text-gold/80">Workshop</span>
+        </span>
+      </a>
+
+      <a
+        href={xProfile}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group/x flex shrink-0 items-center gap-2 rounded-full border border-gold/25 px-2.5 py-1.5 text-gold/85 transition hover:border-gold hover:text-gold-soft"
+        aria-label={t("nav.visitXAria")}
+      >
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"></path>
+        </svg>
+        <span class="hidden font-display text-[0.58rem] uppercase tracking-[0.2em] sm:inline">
+          {t("nav.visitX")}
+        </span>
+      </a>
+    </div>
 
     <div class="flex items-center gap-4">
-      <nav class="hidden items-center gap-7 md:flex" aria-label={t("nav.main")}>
+      <nav class="hidden items-center gap-5 lg:gap-7 md:flex" aria-label={t("nav.main")}>
         {links.map((link) => {
           const active = path === link.page || (link.page !== "/" && path.startsWith(link.page));
           return (
@@ -75,6 +95,17 @@ const links = [
           {link.label}
         </a>
       ))}
+      <a
+        href={xProfile}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 font-display text-sm uppercase tracking-[0.28em] text-gold/85"
+      >
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"></path>
+        </svg>
+        {t("nav.visitX")}
+      </a>
     </div>
   </nav>
 </header>

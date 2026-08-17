@@ -1,0 +1,141 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Filigree from "../../components/Filigree.astro";
+import type { Lang } from "../../i18n/ui";
+import { useTranslations } from "../../i18n/utils";
+import { localizeCharacter } from "../../data/characters";
+import { bandMembers } from "../../data/band";
+import { albums } from "../../data/albums";
+
+const lang = (Astro.currentLocale ?? "es") as Lang;
+const t = useTranslations(lang);
+const roster = bandMembers.map((member) => localizeCharacter(member, lang));
+
+function emphasize(text: string) {
+  return text.split(/\*\*(.+?)\*\*/g);
+}
+
+const story = [t("music.p1"), t("music.p2"), t("music.p3"), t("music.p4")];
+const sunoUrl = "https://suno.com/@reapercodexband";
+---
+
+<Layout title={t("meta.musicTitle")} description={t("meta.musicDesc")}>
+  <section class="mx-auto max-w-6xl px-5 pb-8 pt-8 md:pt-12">
+    <div class="mb-8 flex flex-col items-center text-center">
+      <div class="codex-logo">
+        <img src="/reaper-codex/logo.png" alt={t("music.logoAlt")} />
+      </div>
+    </div>
+
+    <div class="story-panel">
+      <Filigree />
+      <div class="shop-story">
+        <h1 class="font-display gold-text text-[1.55rem] leading-tight md:text-[1.85rem]">
+          {t("music.about")}
+        </h1>
+        {story.map((paragraph) => (
+          <p>
+            {emphasize(paragraph).map((part, i) =>
+              i % 2 ? <strong class="text-paper/95">{part}</strong> : part
+            )}
+          </p>
+        ))}
+        <p class="font-display gold-text mt-8 text-[1.15rem] leading-snug md:text-[1.25rem]">
+          {t("music.close")}
+        </p>
+        <p class="mt-4 text-sm">{t("music.listenNote")}</p>
+        <a
+          href={sunoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-gold mt-6"
+          aria-label={t("music.listenAria")}
+        >
+          {t("music.listen")}
+        </a>
+      </div>
+      <Filigree flip />
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-5 pt-10 md:pt-16">
+    <div class="mb-12 flex flex-col items-center text-center">
+      <div class="flourish">
+        <span class="flourish-line"></span>
+        <h2 class="font-display gold-text text-2xl tracking-[0.18em] uppercase md:text-3xl">
+          {t("music.lineup")}
+        </h2>
+        <span class="flourish-line"></span>
+      </div>
+    </div>
+
+    <div class="photo-table">
+      <div class="photo-scatter">
+        {roster.map((member) => (
+          <figure class="polaroid" tabindex="0">
+            <span class="polaroid-tape" aria-hidden="true"></span>
+            <img
+              class="polaroid-photo"
+              src={member.image}
+              alt={`${member.name} — ${member.role}`}
+            />
+            <figcaption class="polaroid-caption">
+              <span class="polaroid-name">{member.name}</span>
+              <span class="polaroid-role">{member.role}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-16 md:mt-24">
+      <div class="mb-10 flex flex-col items-center text-center">
+        <div class="flourish">
+          <span class="flourish-line"></span>
+          <h2 class="font-display gold-text text-2xl tracking-[0.18em] uppercase md:text-3xl">
+            {t("music.wip")}
+          </h2>
+          <span class="flourish-line"></span>
+        </div>
+        <p class="mt-4 max-w-2xl text-sm text-muted md:text-base">
+          {t("music.wipLead")}
+        </p>
+      </div>
+
+      <div class="album-grid">
+        {albums.map((album) => (
+          <article class="album-sleeve">
+            <div class="album-art">
+              <img src={album.image} alt={album.title || t("music.wipUntitled")} />
+              <span class="album-stamp">{t("music.wipStamp")}</span>
+            </div>
+            {album.title && (
+              <div class="album-meta">
+                <h3 class="font-display gold-text text-base leading-tight md:text-lg">{album.title}</h3>
+                {album.subtitle && (
+                  <p class="mt-1 text-[0.68rem] uppercase tracking-[0.22em] text-gold/70">{album.subtitle}</p>
+                )}
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <figure class="shop-frame shop-frame-band mt-16 md:mt-24">
+      <img src="/reaper-codex/band-2.png" alt={t("music.bandAlt")} />
+    </figure>
+
+    <div class="mt-10 flex flex-col items-center text-center">
+      <a
+        href={sunoUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-gold"
+        aria-label={t("music.listenAria")}
+      >
+        {t("music.listen")}
+      </a>
+    </div>
+  </section>
+</Layout>
