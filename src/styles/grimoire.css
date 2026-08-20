@@ -168,6 +168,75 @@
     0 0 0 6px #2a1210 inset,
     0 0 0 7px rgba(201, 162, 39, 0.4) inset,
     inset 0 0 30px rgba(0, 0, 0, 0.35);
+  transform-origin: left center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* La guarda marmolada que queda a la vista cuando la tapa se abre. */
+.closed-inside {
+  position: absolute;
+  inset: 0 0 0 8%;
+  z-index: 1;
+  background:
+    linear-gradient(rgba(20, 8, 6, 0.22), rgba(20, 8, 6, 0.22)),
+    url("/grimoire/marble.jpg") center / cover;
+  box-shadow:
+    inset 12px 0 26px rgba(20, 8, 4, 0.55),
+    inset 0 0 0 1px rgba(201, 162, 39, 0.25);
+}
+
+.grimoire-closed.is-opening .closed-block,
+.grimoire-closed.is-closing .closed-block {
+  transform: rotate(-1.5deg) translateY(-10px);
+}
+
+.grimoire-closed.is-opening .closed-front {
+  animation: cover-open 0.72s cubic-bezier(0.42, 0, 0.24, 1) 0.18s forwards;
+}
+
+.grimoire-closed.is-closing .closed-front {
+  animation: cover-close 0.62s cubic-bezier(0.42, 0, 0.24, 1) forwards;
+}
+
+.grimoire-closed.is-opening .clasp {
+  animation: clasp-release 0.24s ease forwards;
+}
+
+.grimoire-closed.is-closing .clasp {
+  animation: clasp-latch 0.3s ease 0.34s backwards;
+}
+
+@keyframes cover-open {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(-168deg);
+  }
+}
+
+@keyframes cover-close {
+  from {
+    transform: rotateY(-168deg);
+  }
+  to {
+    transform: rotateY(0deg);
+  }
+}
+
+@keyframes clasp-release {
+  to {
+    transform: translateX(0.7rem) rotate(9deg);
+    opacity: 0;
+  }
+}
+
+@keyframes clasp-latch {
+  from {
+    transform: translateX(0.7rem) rotate(9deg);
+    opacity: 0;
+  }
 }
 
 .cover-plate {
@@ -536,7 +605,8 @@
   z-index: 1;
   height: 100%;
   font-family: "Cormorant Garamond", "Palatino Linotype", Palatino, serif;
-  font-size: clamp(0.98rem, 1.35vw, 1.16rem);
+  /* --fit lo baja el JS cuando el folio no cabe, antes de que se recorte. */
+  font-size: calc(clamp(0.98rem, 1.35vw, 1.16rem) * var(--fit, 1));
   font-weight: 500;
   line-height: 1.62;
   color: var(--ink-brown);
@@ -553,19 +623,25 @@
 .leaf-html p.drop::first-letter {
   float: left;
   font-family: var(--font-display);
-  font-size: 3.35em;
+  font-size: 3.5em;
   font-weight: 700;
-  line-height: 0.82;
-  margin: 0.06em 0.22em 0.04em 0;
-  padding: 0.16em 0.18em 0.08em;
-  color: #f3e6c0;
+  line-height: 0.78;
+  margin: 0.05em 0.24em 0.02em 0;
+  padding: 0.18em 0.2em 0.12em;
+  color: #f9efd0;
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(240, 215, 140, 0.35), transparent 55%),
-    linear-gradient(160deg, #8a6428, #3d2410);
-  border: 1px solid #d4b45a;
+    radial-gradient(ellipse at 26% 16%, rgba(255, 238, 178, 0.5), transparent 58%),
+    radial-gradient(ellipse at 78% 88%, rgba(0, 0, 0, 0.32), transparent 52%),
+    linear-gradient(152deg, #9d7431 0%, #6d4c1d 46%, #32200c 100%);
+  border: 1px solid #dcbf68;
+  border-radius: 2px;
   box-shadow:
-    0 0 0 1px #5c3c14 inset,
-    1px 1px 0 rgba(0, 0, 0, 0.25);
+    inset 0 0 0 1px rgba(255, 228, 164, 0.3),
+    inset 0 0 14px rgba(0, 0, 0, 0.45),
+    0 1px 3px rgba(40, 22, 8, 0.4);
+  text-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.55),
+    0 0 9px rgba(255, 222, 152, 0.4);
 }
 
 .leaf-html h1,
@@ -589,11 +665,27 @@
 
 .leaf-html figure {
   margin: 0;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 0.55rem;
+}
+
+/* Sólo la lámina a sangre llena el folio. Si la imagen convive con prosa,
+   ocupa una banda fija y le deja el resto al texto. */
+.leaf[data-kind="plate"] .leaf-html figure {
+  height: 100%;
+}
+
+.leaf[data-kind="text"] .leaf-html figure {
+  margin-bottom: 0.9rem;
+}
+
+.leaf[data-kind="text"] .leaf-html figure img {
+  aspect-ratio: 16 / 10;
+  height: auto;
+  max-height: none;
+  object-fit: cover;
 }
 
 .leaf-html figure img,
@@ -776,12 +868,102 @@
   box-shadow: inset 18px 0 24px var(--gutter);
 }
 
+/* Velo que oscurece la cara según se aleja de la luz al girar. */
+.flip-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(26, 11, 4, 0.6),
+    rgba(26, 11, 4, 0.16) 46%,
+    transparent 76%
+  );
+}
+
+.flipper-forward .flip-rear::after,
+.flipper-back .flip-front::after {
+  background: linear-gradient(
+    270deg,
+    rgba(26, 11, 4, 0.6),
+    rgba(26, 11, 4, 0.16) 46%,
+    transparent 76%
+  );
+}
+
+.flipper.is-forward .flip-front::after,
+.flipper.is-single-forward .flip-front::after,
+.flipper.is-backward .flip-rear::after,
+.flipper.is-single-back .flip-rear::after {
+  animation: leaf-shade-in 0.78s ease-in-out forwards;
+}
+
+.flipper.is-forward .flip-rear::after,
+.flipper.is-single-forward .flip-rear::after,
+.flipper.is-backward .flip-front::after,
+.flipper.is-single-back .flip-front::after {
+  animation: leaf-shade-out 0.78s ease-in-out forwards;
+}
+
+@keyframes leaf-shade-in {
+  0% {
+    opacity: 0;
+  }
+  55% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes leaf-shade-out {
+  0% {
+    opacity: 0.95;
+  }
+  45% {
+    opacity: 0.68;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .flipper.is-forward {
   animation: grimoire-flip-forward 0.78s ease-in-out forwards;
 }
 
 .flipper.is-backward {
   animation: grimoire-flip-back 0.78s ease-in-out forwards;
+}
+
+.flipper.is-single-forward {
+  animation: grimoire-flip-single-forward 0.68s ease-in-out forwards;
+}
+
+.flipper.is-single-back {
+  animation: grimoire-flip-single-back 0.68s ease-in-out forwards;
+}
+
+@keyframes grimoire-flip-single-forward {
+  from {
+    transform: rotateY(0);
+  }
+  to {
+    transform: rotateY(-180deg);
+  }
+}
+
+@keyframes grimoire-flip-single-back {
+  from {
+    transform: rotateY(180deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
 }
 
 @keyframes grimoire-flip-forward {
@@ -823,9 +1005,26 @@
     grid-template-columns: 1fr;
   }
 
-  .leaf-right,
-  .flipper {
+  .leaf-right {
     display: none;
+  }
+
+  /* En móvil gira la hoja completa sobre el lomo izquierdo, así que las caras
+     del volteo sí se pintan aunque lleven la clase .leaf-right. */
+  .flipper {
+    left: 0;
+    right: auto;
+    width: 100%;
+    transform-origin: left center;
+  }
+
+  .flipper .leaf-right {
+    display: block;
+  }
+
+  .flipper .leaf {
+    border-radius: 0.35rem;
+    box-shadow: inset 0 0 24px var(--gutter);
   }
 
   .leaf-left {
@@ -849,7 +1048,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .flipper.is-forward,
-  .flipper.is-backward {
+  .flipper.is-backward,
+  .flipper.is-single-forward,
+  .flipper.is-single-back,
+  .flip-face::after {
     animation-duration: 0.01ms;
   }
 
@@ -857,6 +1059,14 @@
   .grimoire-closed:hover .closed-block {
     transition: none;
   }
+
+  .grimoire-closed.is-opening .closed-front,
+  .grimoire-closed.is-closing .closed-front,
+  .grimoire-closed.is-opening .clasp,
+  .grimoire-closed.is-closing .clasp {
+    animation: none;
+  }
+
 
   .aura-glow,
   .aura-ring,

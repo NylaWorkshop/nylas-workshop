@@ -12,6 +12,15 @@ const pillars = [
   { icon: "game" as const, title: t("home.pillar.games"), text: t("home.pillar.gamesText") },
   { icon: "code" as const, title: t("home.pillar.code"), text: t("home.pillar.codeText") },
 ];
+
+const sections = [
+  { href: "/bookstore", label: t("nav.bookstore"), icon: "book" as const },
+  { href: "/music", label: t("nav.music"), icon: "music" as const },
+  { href: "/stories", label: t("nav.stories"), icon: "feather" as const },
+  { href: "/games", label: t("nav.games"), icon: "gamepad" as const },
+  { href: "/code", label: t("nav.code"), icon: "code" as const },
+  { href: "/merch", label: t("nav.merch"), icon: "mug" as const },
+];
 ---
 
 <Layout title={t("meta.homeTitle")} description={t("meta.homeDesc")}>
@@ -26,20 +35,68 @@ const pillars = [
         <p class="mt-5 max-w-lg text-base text-paper/90 md:text-[1.05rem]">
           {t("home.lead")}
         </p>
-        <div class="mt-8 flex flex-wrap items-center justify-center gap-3 md:justify-start">
-          <a
-            href={localizePath(lang, "/games")}
-            class="btn-gold"
-          >
-            {t("home.ctaGames")}
-          </a>
-          <a
-            href={localizePath(lang, "/merch")}
-            class="btn-gold-outline"
-          >
-            {t("home.ctaMerch")}
-          </a>
-        </div>
+        <nav
+          class="mt-8 flex flex-wrap items-center justify-center gap-3 md:justify-start"
+          aria-label={t("home.sectionsAria")}
+        >
+          {sections.map((section) => (
+            <a href={localizePath(lang, section.href)} class="btn-icon" aria-label={section.label}>
+              <svg
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                {section.icon === "book" && (
+                  <>
+                    <path d="M12 7v14"></path>
+                    <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3Z"></path>
+                  </>
+                )}
+                {section.icon === "music" && (
+                  <>
+                    <path d="M9 18V5l12-2v13"></path>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <circle cx="18" cy="16" r="3"></circle>
+                  </>
+                )}
+                {section.icon === "feather" && (
+                  <>
+                    <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5Z"></path>
+                    <path d="M16 8 2 22"></path>
+                    <path d="M17.5 15H9"></path>
+                  </>
+                )}
+                {section.icon === "gamepad" && (
+                  <>
+                    <path d="M6.4 9.4h11.2a3.7 3.7 0 0 1 3.6 4.5l-.5 1.55a1.75 1.75 0 0 1-1.7 1.25h-1.25a1.55 1.55 0 0 1-1.25-.7l-.5-.7H8.7l-.5.7a1.55 1.55 0 0 1-1.25.7H5.7a1.75 1.75 0 0 1-1.7-1.25L3.5 13.9a3.7 3.7 0 0 1 2.9-4.5Z"></path>
+                    <path d="M8.15 12.15v2.35M7 13.32h2.3"></path>
+                    <circle cx="15.15" cy="12.55" r="0.55" fill="currentColor" stroke="none"></circle>
+                    <circle cx="17" cy="14.05" r="0.55" fill="currentColor" stroke="none"></circle>
+                  </>
+                )}
+                {section.icon === "code" && (
+                  <>
+                    <path d="m16 18 6-6-6-6"></path>
+                    <path d="m8 6-6 6 6 6"></path>
+                  </>
+                )}
+                {section.icon === "mug" && (
+                  <>
+                    <path d="M10 2v2M14 2v2"></path>
+                    <path d="M4 8h13v9a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4Z"></path>
+                    <path d="M17 10h1.5a2.75 2.75 0 0 1 0 5.5H17"></path>
+                  </>
+                )}
+              </svg>
+              <span class="btn-icon-label">{section.label}</span>
+            </a>
+          ))}
+        </nav>
       </div>
 
       <div class="order-1 flex justify-center md:order-2">

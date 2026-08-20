@@ -142,6 +142,7 @@ const payload = {
         <span class="spine-rib"></span>
         <span class="spine-rib"></span>
       </span>
+      <span class="closed-inside" aria-hidden="true"></span>
       <span class="closed-front">
         <img class="cover-plate" src="/grimoire/cover-plate.jpg" alt="" />
       </span>
@@ -232,6 +233,11 @@ const payload = {
     return { kind: "endpaper", html: "" };
   }
 
+  // El reverso de una hoja que se está volteando: pergamino liso, no guarda marmolada.
+  function backPage(): BookPage {
+    return { kind: "text", html: "" };
+  }
+
   document.querySelectorAll<HTMLElement>("[data-grimoire]").forEach((root) => {
     const jsonEl = root.querySelector<HTMLScriptElement>("[data-grimoire-json]");
     if (!jsonEl?.textContent) return;
@@ -243,6 +249,7 @@ const payload = {
     const pages = data.pages;
     const book = root.querySelector("[data-book]") as HTMLElement;
     const closed = root.querySelector("[data-open]") as HTMLButtonElement;
+    const cover = closed.querySelector(".closed-front") as HTMLElement | null;
     const closeBtn = root.querySelector("[data-close]") as HTMLButtonElement;
     const prevBtn = root.querySelector("[data-prev]") as HTMLButtonElement;
     const nextBtn = root.querySelector("[data-next]") as HTMLButtonElement;
@@ -275,9 +282,62 @@ const payload = {
     const step = () => (isSingle() ? 1 : 2);
     const pageAt = (i: number) => pages[i] ?? blankPage();
 
-    function paintLeaf(leaf: HTMLElement, htmlEl: HTMLElement, page: BookPage) {
+    // El folio tiene altura fija: si el texto no cabe, encogemos la tipografía
+    // en pasos cortos antes de que `overflow: hidden` se lo coma en silencio.
+    const MIN_FIT = 0.76;
+
+    // Medir fuerza reflujo síncrono, y durante un volteo se pintan tres hojas
+    // seguidas. Cada folio se mide una vez por tamaño de ventana y se recuerda.
+    const fitCache = new Map<number, number>();
+
+    function fitLeaf(leaf: HTMLElement, htmlEl: HTMLElement, key?: number) {
+      htmlEl.style.removeProperty("--fit");
+      if (leaf.dataset.kind !== "text") return;
+
+      if (key !== undefined) {
+        const cached = fitCache.get(key);
+        if (cached !== undefined) {
+          if (cached < 1) htmlEl.style.setProperty("--fit", String(cached));
+          return;
+        }
+      }
+
+      if (!htmlEl.clientHeight) return;
+
+      let fit = 1;
+      while (htmlEl.scrollHeight > htmlEl.clientHeight + 1 && fit > MIN_FIT) {
+        fit = Math.round((fit - 0.04) * 100) / 100;
+        htmlEl.style.setProperty("--fit", String(fit));
+      }
+
+      if (key !== undefined) fitCache.set(key, fit);
+
+      if (import.meta.env.DEV && htmlEl.scrollHeight > htmlEl.clientHeight + 1) {
+        console.warn(
+          "[grimoire] Un folio sigue sin caber al " +
+            Math.round(MIN_FIT * 100) +
+            "%. Pártelo con <!-- page -->:",
+          htmlEl.textContent?.slice(0, 60),
+        );
+      }
+    }
+
+    function paintLeaf(
+      leaf: HTMLElement,
+      htmlEl: HTMLElement,
+      page: BookPage,
+      key?: number,
+    ) {
       leaf.dataset.kind = page.kind;
       htmlEl.innerHTML = page.html;
+      fitLeaf(leaf, htmlEl, key);
+    }
+
+    // A rotateY(0) la hoja que gira tapa por completo el folio de debajo, así
+    // que el cambio del estático se hace a cubierto, en el frame siguiente.
+    // Hacerlo antes deja ver un fotograma del folio destino sin tapar.
+    function paintCovered(fn: () => void) {
+      requestAnimationFrame(fn);
     }
 
     function updateFolio() {
@@ -293,11 +353,42 @@ const payload = {
     }
 
     function render() {
-      paintLeaf(leftLeaf, leftHtml, pageAt(index));
+      paintLeaf(leftLeaf, leftHtml, pageAt(index), index);
       if (!isSingle()) {
-        paintLeaf(rightLeaf, rightHtml, pageAt(index + 1));
+        paintLeaf(rightLeaf, rightHtml, pageAt(index + 1), index + 1);
       }
       updateFolio();
+    }
+
+    // En móvil sólo hay un folio a la vista, así que la hoja entera gira sobre
+    // el lomo izquierdo y descubre la siguiente, que ya está pintada debajo.
+    function singleFlip(nextIndex: number, dir: "fwd" | "back") {
+      const flipper = dir === "fwd" ? flipFwd : flipBack;
+      const cls = dir === "fwd" ? "is-single-forward" : "is-single-back";
+
+      if (dir === "fwd") {
+        paintLeaf(ffLeaf, ffHtml, pageAt(index), index);
+        paintLeaf(frLeaf, frHtml, backPage());
+      } else {
+        paintLeaf(bfLeaf, bfHtml, pageAt(nextIndex), nextIndex);
+        paintLeaf(brLeaf, brHtml, backPage());
+      }
+
+      flipper.classList.add("is-on", cls);
+
+      if (dir === "fwd") {
+        paintCovered(() => paintLeaf(leftLeaf, leftHtml, pageAt(nextIndex), nextIndex));
+      }
+      flipper.addEventListener(
+        "animationend",
+        () => {
+          flipper.classList.remove("is-on", cls);
+          index = nextIndex;
+          render();
+          busy = false;
+        },
+        { once: true },
+      );
     }
 
     function goto(target: number, animate: "none" | "fwd" | "back") {
@@ -305,18 +396,26 @@ const payload = {
       const nextIndex = Math.max(0, Math.min(target, max));
       if (nextIndex === index || busy) return;
 
-      if (animate === "none" || reduceMotion.matches || isSingle()) {
+      if (animate === "none" || reduceMotion.matches) {
         index = nextIndex;
         render();
         return;
       }
 
       busy = true;
+
+      if (isSingle()) {
+        singleFlip(nextIndex, animate);
+        return;
+      }
+
       if (animate === "fwd") {
-        paintLeaf(rightLeaf, rightHtml, pageAt(nextIndex + 1));
-        paintLeaf(ffLeaf, ffHtml, pageAt(index + 1));
-        paintLeaf(frLeaf, frHtml, pageAt(nextIndex));
+        paintLeaf(ffLeaf, ffHtml, pageAt(index + 1), index + 1);
+        paintLeaf(frLeaf, frHtml, pageAt(nextIndex), nextIndex);
         flipFwd.classList.add("is-on", "is-forward");
+        paintCovered(() =>
+          paintLeaf(rightLeaf, rightHtml, pageAt(nextIndex + 1), nextIndex + 1),
+        );
         const end = () => {
           flipFwd.classList.remove("is-on", "is-forward");
           index = nextIndex;
@@ -325,10 +424,12 @@ const payload = {
         };
         flipFwd.addEventListener("animationend", end, { once: true });
       } else {
-        paintLeaf(leftLeaf, leftHtml, pageAt(nextIndex));
-        paintLeaf(bfLeaf, bfHtml, pageAt(index));
-        paintLeaf(brLeaf, brHtml, pageAt(nextIndex + 1));
+        paintLeaf(bfLeaf, bfHtml, pageAt(index), index);
+        paintLeaf(brLeaf, brHtml, pageAt(nextIndex + 1), nextIndex + 1);
         flipBack.classList.add("is-on", "is-backward");
+        paintCovered(() =>
+          paintLeaf(leftLeaf, leftHtml, pageAt(nextIndex), nextIndex),
+        );
         const end = () => {
           flipBack.classList.remove("is-on", "is-backward");
           index = nextIndex;
@@ -339,24 +440,66 @@ const payload = {
       }
     }
 
-    function openBook() {
-      open = true;
+    // La tapa gira sobre el lomo antes de dar paso al pliego. `animationend`
+    // puede no llegar (pestaña en segundo plano), así que hay red de seguridad.
+    function onceAnimated(el: HTMLElement | null, ms: number, done: () => void) {
+      let fired = false;
+      const run = () => {
+        if (fired) return;
+        fired = true;
+        done();
+      };
+      el?.addEventListener("animationend", run, { once: true });
+      window.setTimeout(run, ms);
+    }
+
+    function revealBook() {
       closed.hidden = true;
+      closed.classList.remove("is-opening");
       book.classList.add("is-open");
-      root.classList.add("is-open");
       index = 0;
       render();
       stage.focus();
     }
 
+    function openBook() {
+      if (open || busy) return;
+      open = true;
+      root.classList.add("is-open");
+
+      if (reduceMotion.matches) {
+        revealBook();
+        return;
+      }
+
+      busy = true;
+      closed.classList.add("is-opening");
+      onceAnimated(cover, 1200, () => {
+        busy = false;
+        revealBook();
+      });
+    }
+
     function closeBook() {
+      if (!open) return;
       open = false;
       book.classList.remove("is-open");
-      root.classList.remove("is-open");
-      closed.hidden = false;
       busy = false;
-      flipFwd.classList.remove("is-on", "is-forward");
-      flipBack.classList.remove("is-on", "is-backward");
+      flipFwd.classList.remove("is-on", "is-forward", "is-single-forward");
+      flipBack.classList.remove("is-on", "is-backward", "is-single-back");
+      closed.hidden = false;
+
+      if (reduceMotion.matches) {
+        root.classList.remove("is-open");
+        return;
+      }
+
+      closed.classList.add("is-closing");
+      onceAnimated(cover, 1000, () => {
+        closed.classList.remove("is-closing");
+        root.classList.remove("is-open");
+      });
+      closed.focus();
     }
 
     closed.addEventListener("click", openBook);
@@ -429,7 +572,24 @@ const payload = {
     });
 
     singleMq.addEventListener("change", () => {
+      fitCache.clear();
       if (open) render();
+    });
+
+    // El auto-ajuste mide texto: hay que rehacerlo cuando cambian la caja o la
+    // tipografía real (Cormorant llega por webfont, después del primer pintado).
+    let resizeTimer = 0;
+    window.addEventListener("resize", () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        fitCache.clear();
+        if (open && !busy) render();
+      }, 150);
+    });
+
+    document.fonts?.ready.then(() => {
+      fitCache.clear();
+      if (open && !busy) render();
     });
   });
 </script>
