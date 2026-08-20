@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import XFeed from "../../components/XFeed.astro";
 import type { Lang } from "../../i18n/ui";
 import { localizePath, useTranslations } from "../../i18n/utils";
 
@@ -7,9 +8,9 @@ const lang = (Astro.currentLocale ?? "es") as Lang;
 const t = useTranslations(lang);
 
 const pillars = [
-  { mark: "✦", title: t("home.pillar.stories"), text: t("home.pillar.storiesText") },
-  { mark: "▣", title: t("home.pillar.games"), text: t("home.pillar.gamesText") },
-  { mark: "</>", title: t("home.pillar.code"), text: t("home.pillar.codeText") },
+  { icon: "star" as const, title: t("home.pillar.stories"), text: t("home.pillar.storiesText") },
+  { icon: "game" as const, title: t("home.pillar.games"), text: t("home.pillar.gamesText") },
+  { icon: "code" as const, title: t("home.pillar.code"), text: t("home.pillar.codeText") },
 ];
 ---
 
@@ -67,8 +68,29 @@ const pillars = [
     <div class="grid gap-4 md:grid-cols-3">
       {pillars.map((pillar) => (
         <article class="card-frame rounded-2xl px-5 py-5">
-          <p class="font-display text-lg text-gold">{pillar.mark}</p>
-          <h2 class="font-display mt-3 text-lg text-cream">{pillar.title}</h2>
+          <h2 class="font-display flex items-center gap-2.5 text-lg text-cream">
+            <span class="inline-flex shrink-0 text-gold" aria-hidden="true">
+              {pillar.icon === "star" && <span class="text-[1.05em] leading-none">✦</span>}
+              {pillar.icon === "game" && (
+                <svg
+                  class="h-[1.05em] w-[1.05em]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6.4 9.4h11.2a3.7 3.7 0 0 1 3.6 4.5l-.5 1.55a1.75 1.75 0 0 1-1.7 1.25h-1.25a1.55 1.55 0 0 1-1.25-.7l-.5-.7H8.7l-.5.7a1.55 1.55 0 0 1-1.25.7H5.7a1.75 1.75 0 0 1-1.7-1.25L3.5 13.9a3.7 3.7 0 0 1 2.9-4.5Z"></path>
+                  <path d="M8.15 12.15v2.35M7 13.32h2.3"></path>
+                  <circle cx="15.15" cy="12.55" r="0.55" fill="currentColor" stroke="none"></circle>
+                  <circle cx="17" cy="14.05" r="0.55" fill="currentColor" stroke="none"></circle>
+                </svg>
+              )}
+              {pillar.icon === "code" && <span class="text-[0.95em] leading-none tracking-tight">&lt;/&gt;</span>}
+            </span>
+            {pillar.title}
+          </h2>
           <p class="mt-2 text-sm leading-relaxed text-muted">{pillar.text}</p>
         </article>
       ))}
@@ -122,4 +144,6 @@ const pillars = [
       </div>
     </div>
   </section>
+
+  <XFeed />
 </Layout>

@@ -15,5 +15,11 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      watch: {
+        // Obsidian reescribe workspace.json en bucle y dispara recargas infinitas.
+        ignored: ['**/.obsidian/**'],
+      },
+    },
   },
 });

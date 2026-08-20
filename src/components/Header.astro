@@ -11,7 +11,9 @@ const links = [
   { href: localizePath(lang, "/"), page: "/", label: t("nav.home") },
   { href: localizePath(lang, "/bookstore"), page: "/bookstore", label: t("nav.bookstore") },
   { href: localizePath(lang, "/music"), page: "/music", label: t("nav.music") },
+  { href: localizePath(lang, "/stories"), page: "/stories", label: t("nav.stories") },
   { href: localizePath(lang, "/games"), page: "/games", label: t("nav.games") },
+  { href: localizePath(lang, "/code"), page: "/code", label: t("nav.code") },
   { href: localizePath(lang, "/merch"), page: "/merch", label: t("nav.merch") },
 ];
 
@@ -50,14 +52,14 @@ const xProfile = "https://x.com/NylaKatsuki";
     </div>
 
     <div class="flex items-center gap-4">
-      <nav class="hidden items-center gap-5 lg:gap-7 md:flex" aria-label={t("nav.main")}>
+      <nav class="hidden items-center gap-4 lg:flex lg:gap-5 xl:gap-6" aria-label={t("nav.main")}>
         {links.map((link) => {
           const active = path === link.page || (link.page !== "/" && path.startsWith(link.page));
           return (
             <a
               href={link.href}
               class:list={[
-                "font-display text-[0.72rem] uppercase tracking-[0.28em] transition",
+                "font-display text-[0.68rem] uppercase tracking-[0.22em] transition xl:text-[0.72rem] xl:tracking-[0.28em]",
                 active ? "text-gold" : "text-paper/75 hover:text-gold-soft",
               ]}
               aria-current={active ? "page" : undefined}
@@ -72,7 +74,7 @@ const xProfile = "https://x.com/NylaKatsuki";
 
       <button
         id="nav-toggle"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/25 text-gold md:hidden"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gold/25 text-gold lg:hidden"
         aria-expanded="false"
         aria-controls="mobile-nav"
         type="button"
@@ -85,7 +87,7 @@ const xProfile = "https://x.com/NylaKatsuki";
     </div>
   </div>
 
-  <nav id="mobile-nav" class="hidden border-t border-gold/10 px-5 py-4 md:hidden" aria-label={t("nav.mobile")}>
+  <nav id="mobile-nav" class="hidden border-t border-gold/10 px-5 py-4 lg:hidden" aria-label={t("nav.mobile")}>
     <div class="flex flex-col gap-3">
       {links.map((link) => (
         <a

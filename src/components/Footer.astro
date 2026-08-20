@@ -1,6 +1,7 @@
 ---
 import type { Lang } from "../i18n/ui";
 import { localizePath, useTranslations } from "../i18n/utils";
+import PawPrint from "./PawPrint.astro";
 
 const lang = (Astro.currentLocale ?? "es") as Lang;
 const t = useTranslations(lang);
@@ -11,14 +12,7 @@ const year = new Date().getFullYear();
   <div class="mx-auto max-w-6xl px-5 py-10">
     <div class="flourish mb-6">
       <span class="flourish-line"></span>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <circle cx="6.8" cy="10.2" r="2.05"></circle>
-        <circle cx="12" cy="8.4" r="2.05"></circle>
-        <circle cx="17.2" cy="10.2" r="2.05"></circle>
-        <circle cx="9.2" cy="5.7" r="1.55"></circle>
-        <circle cx="14.8" cy="5.7" r="1.55"></circle>
-        <ellipse cx="12" cy="16.6" rx="5.2" ry="3.4"></ellipse>
-      </svg>
+      <PawPrint size={22} />
       <span class="flourish-line"></span>
     </div>
 
@@ -30,7 +24,9 @@ const year = new Date().getFullYear();
         <a class="hover:text-gold" href={localizePath(lang, "/")}>{t("nav.home")}</a>
         <a class="hover:text-gold" href={localizePath(lang, "/bookstore")}>{t("nav.bookstore")}</a>
         <a class="hover:text-gold" href={localizePath(lang, "/music")}>{t("nav.music")}</a>
+        <a class="hover:text-gold" href={localizePath(lang, "/stories")}>{t("nav.stories")}</a>
         <a class="hover:text-gold" href={localizePath(lang, "/games")}>{t("nav.games")}</a>
+        <a class="hover:text-gold" href={localizePath(lang, "/code")}>{t("nav.code")}</a>
         <a class="hover:text-gold" href={localizePath(lang, "/merch")}>{t("nav.merch")}</a>
       </nav>
       <p class="mt-4 text-xs text-muted/80">© {year} Nyla's Workshop</p>
