@@ -30,12 +30,16 @@ Después escribe el texto con calma en el archivo que te abre.
 <!-- page -->
 ```
 
-Cada trozo entre marcas es una página del libro. **Si un folio solo lleva una
-imagen, se muestra a página completa**; si la imagen va acompañada de texto,
-ocupa una banda y le deja el resto a la prosa.
+Ya no son páginas de un libro que se hojea: el relato se lee de un tirón, en
+columna, y cada marca es un **respiro** entre bloques (sale una filigrana
+dorada entre dos trozos de prosa seguidos).
 
-**El texto que no cabe se encoge solo** hasta un 76%. Si aún así no entra, verás
-un aviso en la consola del navegador diciéndote qué folio partir en dos.
+**Si un folio solo lleva una imagen**, se muestra como lámina: más ancha que la
+columna de texto y sin recortar. Si la imagen va acompañada de prosa, se queda
+al ancho de la columna.
+
+**El texto ya no se encoge ni se recorta**: escribe lo largo que quieras. Los
+folios sirven para dar ritmo, no porque haya que hacer caber nada.
 
 **Markdown que entiende el grimorio:** párrafos, **negrita**, *cursiva*,
 títulos `# ## ###` e imágenes. Nada más; no hay listas ni tablas.
@@ -58,4 +62,5 @@ Copia `_plantilla.es.md` a `src/stories/mi-relato.es.md` (minúsculas, números 
 guiones). Añade `mi-relato.en.md` para la versión inglesa. Las imágenes van en
 `public/stories/mi-relato/` y se enlazan con `/stories/mi-relato/01.jpg`.
 
-El servidor local recarga solo: abre Historias y hojéalo.
+El servidor local recarga solo: abre Historias, elige el tomo en el estante
+y léelo.

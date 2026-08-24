@@ -1,4 +1,6 @@
 ---
+// Huella de gato del taller. La misma geometría vive en public/favicon.svg
+// (escalada a un lienzo de 64): si tocas una, toca la otra.
 interface Props {
   class?: string;
   size?: number;
@@ -15,11 +17,9 @@ const { class: className, size = 22 } = Astro.props;
   fill="currentColor"
   aria-hidden="true"
 >
-  <ellipse cx="5.9" cy="8.55" rx="1.7" ry="2.75" transform="rotate(-34 5.9 8.55)"></ellipse>
-  <ellipse cx="9.7" cy="4.85" rx="1.78" ry="2.9" transform="rotate(-11 9.7 4.85)"></ellipse>
-  <ellipse cx="14.3" cy="4.85" rx="1.78" ry="2.9" transform="rotate(11 14.3 4.85)"></ellipse>
-  <ellipse cx="18.1" cy="8.55" rx="1.7" ry="2.75" transform="rotate(34 18.1 8.55)"></ellipse>
-  <circle cx="9.7" cy="14.55" r="2.55"></circle>
-  <circle cx="14.3" cy="14.55" r="2.55"></circle>
-  <path d="M12 22.15C8.6 21.7 5.85 19.2 5.85 16.55 5.85 14.9 8.35 14.6 12 16.35 15.65 14.6 18.15 14.9 18.15 16.55 18.15 19.2 15.4 21.7 12 22.15Z"></path>
+  <ellipse cx="4.2" cy="9.3" rx="1.95" ry="2.55" transform="rotate(-40 4.2 9.3)"></ellipse>
+  <ellipse cx="9.1" cy="5.9" rx="2.05" ry="2.7" transform="rotate(-13 9.1 5.9)"></ellipse>
+  <ellipse cx="14.9" cy="5.9" rx="2.05" ry="2.7" transform="rotate(13 14.9 5.9)"></ellipse>
+  <ellipse cx="19.8" cy="9.3" rx="1.95" ry="2.55" transform="rotate(40 19.8 9.3)"></ellipse>
+  <path d="M12 10.3C14.6 10.3 16.75 11.55 17.65 13.5C18.25 14.8 18.5 15.95 18.5 16.95C18.5 19.05 17.4 20.5 15.95 20.5C15 20.5 14.4 19.95 13.7 19.95C13 19.95 12.8 20.85 12 20.85C11.2 20.85 11 19.95 10.3 19.95C9.6 19.95 9 20.5 8.05 20.5C6.6 20.5 5.5 19.05 5.5 16.95C5.5 15.95 5.75 14.8 6.35 13.5C7.25 11.55 9.4 10.3 12 10.3Z"></path>
 </svg>

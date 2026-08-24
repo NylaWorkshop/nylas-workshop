@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Grimoire from "../../components/Grimoire.astro";
+import StoryReader from "../../components/StoryReader.astro";
 import { getStories } from "../../lib/stories";
 import { useTranslations } from "../../i18n/utils";
 
@@ -17,18 +17,17 @@ const stories = getStories(Astro.currentLocale);
     </p>
   </section>
 
-  <Grimoire
+  <StoryReader
     stories={stories}
     ui={{
-      coverTitle: t("stories.coverTitle"),
-      coverKicker: t("stories.coverKicker"),
-      coverHint: t("stories.coverHint"),
-      close: t("stories.close"),
-      next: t("stories.next"),
-      prev: t("stories.prev"),
-      contents: t("stories.contents"),
+      shelf: t("stories.shelf"),
+      shelfAria: t("stories.shelfAria"),
+      now: t("stories.now"),
+      readTime: t("stories.readTime"),
+      folios: t("stories.folios"),
       end: t("stories.end"),
-      keysHint: t("stories.keysHint"),
+      top: t("stories.top"),
+      note: t("stories.note"),
     }}
   />
 </Layout>
