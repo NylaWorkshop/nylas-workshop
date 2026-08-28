@@ -1,14 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { formatPrice, shopProducts, shopUrl } from "../../data/shop";
 import { useTranslations } from "../../i18n/utils";
 
 const t = useTranslations(Astro.currentLocale);
-
-const items = [
-  { title: t("merch.mug"), note: t("merch.mugNote") },
-  { title: t("merch.print"), note: t("merch.printNote") },
-  { title: t("merch.stickers"), note: t("merch.stickersNote") },
-];
+const lang = Astro.currentLocale ?? "es";
 ---
 
 <Layout title={t("meta.merchTitle")} description={t("meta.merchDesc")}>
@@ -21,14 +17,32 @@ const items = [
   </section>
 
   <section class="mx-auto grid max-w-6xl gap-5 px-5 sm:grid-cols-2 lg:grid-cols-3">
-    {items.map((item) => (
-      <article class="card-frame rounded-3xl p-6">
-        <span class="rounded-full border border-gold/25 px-3 py-1 text-[0.65rem] uppercase tracking-[0.18em] text-gold-soft">
-          {t("merch.status")}
+    {shopProducts.map((item) => (
+      <a class="shop-card" href={item.href} target="_blank" rel="noopener noreferrer">
+        <span class="shop-card-media">
+          <img src={item.image} alt={item.title} />
         </span>
-        <h2 class="font-display mt-4 text-lg text-cream">{item.title}</h2>
-        <p class="mt-3 text-sm text-muted">{item.note}</p>
-      </article>
+        <span class="shop-card-body">
+          {item.compareAt && (
+            <span class="shop-badge">{t("merch.sale")}</span>
+          )}
+          <h2 class="font-display mt-2 text-lg text-cream">{item.title}</h2>
+          <p class="mt-2 text-sm text-muted">{t(item.noteKey)}</p>
+          <p class="shop-price">
+            {item.compareAt && (
+              <s>{formatPrice(item.compareAt, lang)}</s>
+            )}
+            <strong>{formatPrice(item.price, lang)}</strong>
+          </p>
+          <span class="shop-buy">{t("merch.buy")}</span>
+        </span>
+      </a>
     ))}
   </section>
+
+  <div class="mx-auto mt-10 flex max-w-6xl justify-center px-5">
+    <a class="btn-gold" href={shopUrl} target="_blank" rel="noopener noreferrer">
+      {t("merch.shopCta")}
+    </a>
+  </div>
 </Layout>

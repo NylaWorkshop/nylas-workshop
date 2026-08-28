@@ -3,9 +3,18 @@
    aquí el relato fluye y se lee de un tirón. */
 
 .reader {
-  --reader-col: 34rem;   /* columna de prosa: ~68 caracteres por línea */
-  --reader-wide: 46rem;  /* láminas y encabezados, algo más anchos */
-  --reader-top: 4.55rem; /* alto de la cabecera pegajosa del sitio */
+  /* Columna de prosa: crece con la pantalla hasta ~72 caracteres por línea,
+     que es donde el ojo aún vuelve solo al principio del renglón. */
+  --reader-col: min(100%, 44rem);
+  --reader-wide: min(100%, 54rem);  /* láminas y encabezados, algo más anchos */
+  --reader-top: 4.55rem;            /* alto de la cabecera pegajosa del sitio */
+}
+
+@media (min-width: 1280px) {
+  .reader {
+    --reader-col: min(100%, 48rem);
+    --reader-wide: min(100%, 58rem);
+  }
 }
 
 /* ---------------------------------------------------------- El estante -- */
@@ -294,12 +303,15 @@
 
 .reader-prose {
   max-width: var(--reader-wide);
-  margin: 2.4rem auto 0;
+  margin: 2.6rem auto 0;
   font-family: "Cormorant Garamond", "Palatino Linotype", Palatino, serif;
-  font-size: clamp(1.12rem, 1.5vw, 1.26rem);
+  font-size: clamp(1.18rem, 0.98rem + 0.55vw, 1.45rem);
   font-weight: 500;
-  line-height: 1.85;
-  color: rgba(234, 230, 220, 0.93);
+  line-height: 1.82;
+  color: rgba(238, 234, 225, 0.95);
+  text-wrap: pretty;
+  hyphens: auto;
+  hyphenate-limit-chars: 8 4 3; /* nada de cortar palabras cortas */
 }
 
 .reader-folio[data-kind="text"] {
@@ -308,7 +320,15 @@
 }
 
 .reader-prose p {
-  margin: 0 0 1.15em;
+  margin: 0 0 1.05em;
+}
+
+/* Diálogo: la raya (o la comilla) asoma al margen y las líneas siguientes
+   quedan alineadas bajo la primera palabra, como en un libro impreso. */
+.reader-prose p.speech {
+  margin-bottom: 0.85em;
+  padding-left: 1.1em;
+  text-indent: -1.1em;
 }
 
 .reader-prose p:last-child {

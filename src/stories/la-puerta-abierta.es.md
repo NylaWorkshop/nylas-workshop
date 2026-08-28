@@ -8,11 +8,9 @@ order: 1
 
 La lluvia en esta ciudad no moja: barniza. El neón se arrastra por el asfalto como si buscara dónde sentarse, y tú —con el café a medio terminar y el paraguas olvidado en casa— tomas una calle que ayer no estaba.
 
-No sale en ninguna guía. Tampoco en el GPS. Solo un letrero de madera, demasiado antiguo para este barrio, con una huella dorada apenas visible.
-
 <!-- page -->
 
-![Nyla's Books & Tomes, escondida entre el neón y la lluvia](/bookstore/nylas_bookstore.png)
+No sale en ninguna guía. Tampoco en el GPS. Solo un letrero de madera, demasiado antiguo para este barrio, con una huella dorada apenas visible.
 
 Una librería de fantasía, escondida entre el acero y los circuitos.
 
@@ -26,10 +24,6 @@ Detrás del mostrador, una gata de gafas te mira como si ya supiera qué libro v
 
 <!-- page -->
 
-![Nyla, dueña de la librería](/characters/nyla.jpg)
-
-<!-- page -->
-
 Entre las estanterías, Elowen sostiene un tomo que no recuerda haber catalogado. La cubierta es oscura, el lomo no tiene título, y al abrirlo las páginas huelen a lluvia que aún no ha caído.
 
 —Este no estaba ayer —susurra.
@@ -37,10 +31,6 @@ Entre las estanterías, Elowen sostiene un tomo que no recuerda haber catalogado
 Tsuki, desde el mostrador, sube un punto el metal.
 
 —Los buenos libros llegan cuando les da la gana.
-
-<!-- page -->
-
-![Nyla, Tsuki y Elowen en la librería](/bookstore/final_staff.png)
 
 <!-- page -->
 

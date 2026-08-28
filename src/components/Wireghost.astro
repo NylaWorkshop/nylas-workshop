@@ -1,0 +1,534 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+import { formatMoney, wireghostFunding } from "../data/wireghost";
+import type { Lang, UiKey } from "../i18n/ui";
+import { useTranslations } from "../i18n/utils";
+import "../styles/wireghost.css";
+
+const lang = (Astro.currentLocale ?? "es") as Lang;
+const t = useTranslations(lang);
+
+const root = path.join(process.cwd(), "public/games/wireghost");
+const coverFile = ["cover.jpg", "cover.png", "cover.webp"].find((name) =>
+  fs.existsSync(path.join(root, name)),
+);
+const cover = coverFile ? `/games/wireghost/${coverFile}` : "";
+
+const screensDir = path.join(root, "screens");
+const screens = fs.existsSync(screensDir)
+  ? fs
+      .readdirSync(screensDir)
+      .filter((name) => /\.(png|jpe?g|webp)$/i.test(name))
+      .sort()
+      .map((name) => `/games/wireghost/screens/${name}`)
+  : [];
+
+const { raised, kofiUrl, crypto, goals } = wireghostFunding;
+const wallets = crypto.filter((wallet) => wallet.address.trim());
+const maxGoal = Math.max(...goals.map((goal) => goal.amount), 1);
+const progress = Math.min(100, Math.round((raised / maxGoal) * 100));
+
+const goalKey: Record<string, UiKey> = {
+  hosting: "games.wireghost.goal.hosting",
+  merch: "games.wireghost.goal.merch",
+  cases: "games.wireghost.goal.cases",
+  prints: "games.wireghost.goal.prints",
+};
+
+const labels = {
+  copy: t("games.wireghost.pay.copyAddr"),
+  copied: t("games.wireghost.copied"),
+};
+
+/* Ko-fi y las carteras salen como tarjetas numeradas del mismo tipo, así que
+   se montan en una lista y el orden decide el 01, 02, 03... */
+type PayMethod = {
+  id: string;
+  name: string;
+  note: string;
+  href?: string;
+  address?: string;
+};
+
+const payMethods: PayMethod[] = [
+  ...(kofiUrl
+    ? [{ id: "kofi", name: "Ko-fi", note: t("games.wireghost.pay.kofiNote"), href: kofiUrl }]
+    : []),
+  ...wallets.map((wallet) => ({
+    id: wallet.id,
+    name: wallet.name,
+    note: t("games.wireghost.pay.cryptoNote"),
+    address: wallet.address,
+  })),
+];
+
+/* Etiquetas de la ventana de conexión: viajan al cliente como JSON porque el
+   script del navegador no puede llamar a t(). */
+const commsLabels = {
+  head: t("games.wireghost.cm.head"),
+  ok: t("games.wireghost.cm.ok"),
+  dial: t("games.wireghost.cm.dial"),
+  key: t("games.wireghost.cm.key"),
+  hop: t("games.wireghost.cm.hop"),
+  fp: t("games.wireghost.cm.fp"),
+  wallet: t("games.wireghost.cm.wallet"),
+  ready: t("games.wireghost.cm.ready"),
+};
+
+const downloadLabels = {
+  ok: t("games.wireghost.cm.ok"),
+  hop: t("games.wireghost.cm.hop"),
+  head: t("games.wireghost.dl.head"),
+  auth: t("games.wireghost.dl.auth"),
+  mirror: t("games.wireghost.dl.mirror"),
+  fetch: t("games.wireghost.dl.fetch"),
+  fail: t("games.wireghost.dl.fail"),
+  err: t("games.wireghost.dl.err"),
+  reason: t("games.wireghost.dl.reason"),
+};
+---
+
+<article id="wireghost" class="wg" data-wireghost>
+  <div class="wg-hero">
+    <div class:list={["wg-cover", !cover && "wg-cover-empty"]}>
+      {cover ? (
+        <img src={cover} alt={t("games.wireghost.coverAlt")} />
+      ) : (
+        <div class="wg-cover-fallback">
+          <p class="wg-cover-mark">{t("games.wireghost.placeholder")}</p>
+          <p class="wg-cover-note">{t("games.wireghost.placeholderNote")}</p>
+        </div>
+      )}
+    </div>
+
+    <div class="wg-copy">
+      <p class="wg-kicker">{t("games.wireghost.kicker")}</p>
+      <div class="wg-title-row">
+        <h2 class="font-display gold-text text-3xl md:text-4xl">Wireghost</h2>
+        <span class="wg-stamp">{t("games.wireghost.status")}</span>
+      </div>
+      <p class="wg-tag">{t("games.wireghost.tag")}</p>
+      <p class="wg-desc">{t("games.wireghost.desc")}</p>
+
+      <div class="wg-actions">
+        <button class="btn-gold" type="button" data-donate-open>
+          {t("games.wireghost.donate")}
+        </button>
+        <button class="wg-hack" type="button" data-download-open aria-label={t("games.wireghost.dl.aria")}>
+          <span class="wg-hack-file">{t("games.wireghost.download")}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {screens.length > 0 && (
+    <section class="wg-screens" aria-label={t("games.wireghost.screens")}>
+      <h3 class="wg-section-title">{t("games.wireghost.screens")}</h3>
+      <div class="wg-thumbs">
+        {screens.map((src, index) => (
+          <button class="wg-thumb" type="button" data-screen={src} data-index={index}>
+            <img src={src} alt={`${t("games.wireghost.screenAlt")} ${index + 1}`} />
+          </button>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="wg-fund" aria-label={t("games.wireghost.goals")}>
+    <div class="wg-fund-head">
+      <h3 class="wg-section-title">{t("games.wireghost.goals")}</h3>
+      <p class="wg-raised">
+        {t("games.wireghost.raised")}
+        <strong>{formatMoney(raised, lang)}</strong>
+        <span>/ {formatMoney(maxGoal, lang)}</span>
+      </p>
+    </div>
+    <div class="wg-bar" role="progressbar" aria-valuemin="0" aria-valuemax={maxGoal} aria-valuenow={raised}>
+      <span class="wg-bar-fill" style={`width: ${progress}%`}></span>
+    </div>
+    <ol class="wg-goals">
+      {goals.map((goal) => {
+        const done = raised >= goal.amount;
+        return (
+          <li class:list={["wg-goal", done && "is-done"]}>
+            <span class="wg-goal-mark" aria-hidden="true">{done ? "▣" : "□"}</span>
+            <div>
+              <p class="wg-goal-title">{t(goalKey[goal.id] ?? "games.wireghost.goals")}</p>
+              <p class="wg-goal-amount">{formatMoney(goal.amount, lang)}</p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+    <p class="wg-credits">
+      <span class="wg-credits-rule" aria-hidden="true"></span>
+      <span class="wg-credits-text">{t("games.wireghost.credits")}</span>
+      <span class="wg-credits-rule" aria-hidden="true"></span>
+    </p>
+  </section>
+
+  <dialog class="wg-dialog wg-cm" data-donate-dialog>
+    <div class="wg-cm-bar">
+      <span class="wg-cm-dot" aria-hidden="true"></span>
+      <span class="wg-cm-tag">{t("games.wireghost.cm.tag")}</span>
+      <button class="wg-cm-x" type="button" data-donate-close aria-label={t("games.wireghost.close")}>×</button>
+    </div>
+
+    <div class="wg-cm-ask" data-cm-ask>
+      <p class="wg-cm-title">{t("games.wireghost.cm.title")}</p>
+      <p class="wg-cm-body" set:html={t("games.wireghost.cm.body")} />
+      <p class="wg-cm-warn">{t("games.wireghost.cm.warn")}</p>
+      <div class="wg-cm-btns">
+        <button class="wg-cm-yes" type="button" data-cm-yes>{t("games.wireghost.cm.yes")}</button>
+        <button class="wg-cm-no" type="button" data-donate-close>{t("games.wireghost.cm.no")}</button>
+      </div>
+    </div>
+
+    <pre class="wg-cm-log" data-cm-log hidden aria-live="polite"></pre>
+    <p class="wg-cm-hint" data-cm-hint hidden>{t("games.wireghost.cm.skip")}</p>
+
+    <div class="wg-cm-pay" data-cm-pay hidden>
+      <p class="wg-cm-lead">{t("games.wireghost.donateLead")}</p>
+
+      <p class="wg-section-title wg-methods-title">{t("games.wireghost.pay.title")}</p>
+      {payMethods.length === 0 && <p class="wg-pending">{t("games.wireghost.pending")}</p>}
+
+      <div class="wg-methods">
+        {payMethods.map((method, index) => (
+          <article class="wg-method">
+            <span class="wg-method-idx" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <p class="wg-method-name">{method.name}</p>
+            <p class="wg-method-note">{method.note}</p>
+
+            {method.address && <code class="wg-method-addr">{method.address}</code>}
+
+            {method.href && (
+              <a class="wg-method-go" href={method.href} target="_blank" rel="noopener noreferrer">
+                {t("games.wireghost.pay.kofiCta")}
+              </a>
+            )}
+            {method.address && (
+              <button
+                class="wg-method-go"
+                type="button"
+                data-copy={method.address}
+                data-copy-label={labels.copy}
+                data-copied-label={labels.copied}
+              >
+                {labels.copy}
+              </button>
+            )}
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <script type="application/json" data-cm-i18n set:html={JSON.stringify(commsLabels)} />
+  </dialog>
+
+  <dialog class="wg-dialog wg-cm wg-cm-dl" data-download-dialog>
+    <div class="wg-cm-bar">
+      <span class="wg-cm-dot" aria-hidden="true"></span>
+      <span class="wg-cm-tag">{t("games.wireghost.dl.tag")}</span>
+      <button class="wg-cm-x" type="button" data-download-close aria-label={t("games.wireghost.close")}>×</button>
+    </div>
+
+    <div class="wg-cm-ask" data-cm-ask>
+      <p class="wg-cm-title">{t("games.wireghost.dl.title")}</p>
+      <p class="wg-cm-body" set:html={t("games.wireghost.dl.body")} />
+      <p class="wg-cm-warn">{t("games.wireghost.dl.warn")}</p>
+      <div class="wg-cm-btns">
+        <button class="wg-cm-yes" type="button" data-cm-yes>{t("games.wireghost.dl.yes")}</button>
+        <button class="wg-cm-no" type="button" data-download-close>{t("games.wireghost.cm.no")}</button>
+      </div>
+    </div>
+
+    <pre class="wg-cm-log" data-cm-log hidden aria-live="polite"></pre>
+    <p class="wg-cm-hint" data-cm-hint hidden>{t("games.wireghost.cm.skip")}</p>
+
+    <div class="wg-cm-pay" data-cm-done hidden>
+      <p class="wg-cm-soon-title">{t("games.wireghost.dl.noteTitle")}</p>
+      <p class="wg-cm-soon">{t("games.wireghost.dl.note")}</p>
+      <div class="wg-cm-btns">
+        <button class="wg-cm-no" type="button" data-download-close>{t("games.wireghost.dl.back")}</button>
+      </div>
+    </div>
+
+    <script type="application/json" data-dl-i18n set:html={JSON.stringify(downloadLabels)} />
+  </dialog>
+
+  <dialog class="wg-lightbox" data-lightbox>
+    <form method="dialog">
+      <button class="wg-lightbox-close" value="close" aria-label={t("games.wireghost.close")}>×</button>
+    </form>
+    <img data-lightbox-img alt={t("games.wireghost.screenAlt")} />
+  </dialog>
+</article>
+
+<script>
+  type Labels = Record<string, string>;
+
+  type Ctx = {
+    L: Labels;
+    dialog: HTMLDialogElement;
+    live: () => boolean;
+    add: (html: string) => void;
+    wait: (ms: number) => Promise<unknown>;
+    dots: (label: string, count: number, iv: number) => Promise<void>;
+    hop: (index: number, total: number, opts?: { stopAt?: number }) => Promise<void>;
+    fingerprint: () => string;
+  };
+
+  /* Los mismos relés que usa el juego para enrutar la llamada. */
+  const RELAYS = [
+    "ams-relay-07", "syd-relay-19", "rey-relay-02", "lis-relay-11", "osl-relay-04",
+    "sgp-relay-23", "yyz-relay-08", "tll-relay-15", "gru-relay-12", "jnb-relay-05",
+  ];
+  const BAR_WIDTH = 18;
+
+  const hex = (n: number) =>
+    Array.from({ length: n }, () => "0123456789abcdef"[Math.floor(Math.random() * 16)]).join("");
+  const esc = (value: string) =>
+    value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* =====================================================================
+     CANAL SEGURO. Motor de las ventanas de conexión, calcado del comms.js
+     de Wireghost: la misma coreografía sirve para el canal de donación y
+     para el de descarga, cada uno con sus etiquetas y su guion.
+     ===================================================================== */
+  function wireChannel(opts: {
+    dialog: HTMLDialogElement | null;
+    openBtn: Element | null;
+    closeSel: string;
+    labelsSel: string;
+    panelSel: string;
+    run: (ctx: Ctx) => Promise<void>;
+  }) {
+    const { dialog, openBtn } = opts;
+    if (!dialog || !openBtn) return;
+
+    const ask = dialog.querySelector<HTMLElement>("[data-cm-ask]");
+    const log = dialog.querySelector<HTMLPreElement>("[data-cm-log]");
+    const hint = dialog.querySelector<HTMLElement>("[data-cm-hint]");
+    const panel = dialog.querySelector<HTMLElement>(opts.panelSel);
+    const yes = dialog.querySelector<HTMLButtonElement>("[data-cm-yes]");
+    const raw = dialog.querySelector<HTMLScriptElement>(opts.labelsSel)?.textContent;
+    const L: Labels | null = raw ? JSON.parse(raw) : null;
+
+    let running = false;
+    let skipped = false;
+    let epoch = 0;
+
+    /* Deja la ventana en la pantalla de "¿contactar?" y anula cualquier
+       conexión que siguiera corriendo. */
+    function reset() {
+      epoch += 1;
+      running = false;
+      dialog.classList.remove("is-bad");
+      ask?.removeAttribute("hidden");
+      log?.setAttribute("hidden", "");
+      hint?.setAttribute("hidden", "");
+      panel?.setAttribute("hidden", "");
+      if (log) log.innerHTML = "";
+    }
+
+    openBtn.addEventListener("click", () => {
+      reset();
+      dialog.showModal();
+      yes?.focus();
+    });
+
+    dialog.querySelectorAll(opts.closeSel).forEach((btn) => {
+      btn.addEventListener("click", () => dialog.close());
+    });
+    dialog.addEventListener("close", reset);
+
+    async function connect() {
+      if (!log || !L || running) return;
+      running = true;
+      skipped = false;
+      const token = ++epoch;
+      /* Si cierran la ventana a mitad del enlace, la animación se abandona
+         en el siguiente paso en vez de seguir escribiendo a ciegas. */
+      const live = () => token === epoch;
+      const wait = (ms: number) =>
+        skipped || reduced ? Promise.resolve() : new Promise((r) => setTimeout(r, ms));
+
+      dialog.classList.remove("is-bad");
+      ask?.setAttribute("hidden", "");
+      log.removeAttribute("hidden");
+      if (!reduced) hint?.removeAttribute("hidden");
+      log.innerHTML = "";
+
+      const add = (html: string) => {
+        log.innerHTML += html;
+        log.scrollTop = log.scrollHeight;
+      };
+
+      async function dots(label: string, count: number, iv: number) {
+        add(`<span class="cm-lbl">${esc(label)}</span>`);
+        for (let i = 0; i < count; i++) {
+          if (!live()) return;
+          add(".");
+          await wait(iv);
+        }
+        add(` <span class="cm-ok">${esc(L.ok)}</span>\n`);
+      }
+
+      const chain = RELAYS.slice().sort(() => Math.random() - 0.5);
+
+      /* Un rebote. Con stopAt la barra se queda a medias: el que llama
+         remata la línea (así es como se cuelga la descarga). */
+      async function hop(index: number, total: number, hopOpts?: { stopAt?: number }) {
+        const stopAt = hopOpts?.stopAt ?? BAR_WIDTH;
+        const name = index === total - 1 ? "????-relay-??" : chain[index % chain.length];
+        const label = L.hop
+          .replace("{i}", String(index + 1))
+          .replace("{n}", String(total))
+          .replace("{name}", name);
+        const base = log.innerHTML;
+        for (let step = 0; step <= stopAt; step++) {
+          if (!live()) return;
+          log.innerHTML =
+            base +
+            `<span class="cm-lbl">${esc(label)}</span>[<span class="cm-bar">${"█".repeat(step)}</span>${"░".repeat(BAR_WIDTH - step)}]`;
+          await wait(26);
+        }
+        if (stopAt < BAR_WIDTH) return;
+        log.innerHTML += `  <span class="cm-ms">${9 + Math.floor(Math.random() * 90)} ms</span>\n`;
+        log.scrollTop = log.scrollHeight;
+        await wait(90);
+      }
+
+      await opts.run({
+        L,
+        dialog,
+        live,
+        add,
+        wait,
+        dots,
+        hop,
+        fingerprint: () => (hex(32).match(/.{2}/g) ?? []).join(":"),
+      });
+
+      if (!live()) return;
+      hint?.setAttribute("hidden", "");
+      panel?.removeAttribute("hidden");
+      running = false;
+      skipped = false;
+      panel?.querySelector<HTMLElement>("a, button")?.focus();
+    }
+
+    yes?.addEventListener("click", connect);
+    log?.addEventListener("click", () => {
+      if (running) skipped = true;
+    });
+    dialog.addEventListener("keydown", (event) => {
+      if (running) {
+        if (event.key !== "Escape") skipped = true;
+        return;
+      }
+      if (ask?.hasAttribute("hidden")) return;
+      /* Enter sobre CANCELAR o sobre la × cierra, no conecta. */
+      if ((event.target as HTMLElement)?.closest?.(opts.closeSel)) return;
+      const key = event.key.toLowerCase();
+      if (key === "enter" || key === "s" || key === "y") {
+        event.preventDefault();
+        connect();
+      }
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-wireghost]").forEach((root) => {
+    /* --- donación: la ruta se establece y se abre el mostrador --------- */
+    wireChannel({
+      dialog: root.querySelector<HTMLDialogElement>("[data-donate-dialog]"),
+      openBtn: root.querySelector("[data-donate-open]"),
+      closeSel: "[data-donate-close]",
+      labelsSel: "[data-cm-i18n]",
+      panelSel: "[data-cm-pay]",
+      run: async (cm) => {
+        cm.add(`<span class="cm-hd">${esc(cm.L.head)}</span>\n\n`);
+        await cm.wait(160);
+        await cm.dots(cm.L.dial, 7, 55);
+        await cm.dots(cm.L.key, 5, 65);
+        if (!cm.live()) return;
+
+        for (let i = 0; i < 3; i++) await cm.hop(i, 3);
+        if (!cm.live()) return;
+
+        cm.add(`\n<span class="cm-dim">${esc(cm.L.fp)} SHA256:${cm.fingerprint()}</span>\n`);
+        await cm.wait(220);
+        await cm.dots(cm.L.wallet, 4, 75);
+        await cm.wait(160);
+        if (!cm.live()) return;
+        cm.add(`\n<span class="cm-done">${esc(cm.L.ready)}</span>\n`);
+        await cm.wait(520);
+      },
+    });
+
+    /* --- descarga: la build todavía no existe, así que el enlace revienta
+           a mitad del segundo rebote (el C.fail del juego) -------------- */
+    wireChannel({
+      dialog: root.querySelector<HTMLDialogElement>("[data-download-dialog]"),
+      openBtn: root.querySelector("[data-download-open]"),
+      closeSel: "[data-download-close]",
+      labelsSel: "[data-dl-i18n]",
+      panelSel: "[data-cm-done]",
+      run: async (cm) => {
+        cm.add(`<span class="cm-hd">${esc(cm.L.head)}</span>\n\n`);
+        await cm.wait(160);
+        await cm.dots(cm.L.auth, 6, 58);
+        await cm.dots(cm.L.fetch, 6, 54);
+        await cm.dots(cm.L.mirror, 5, 62);
+        if (!cm.live()) return;
+
+        /* El primer rebote entra; el segundo se queda colgado a media barra. */
+        await cm.hop(0, 2);
+        await cm.hop(1, 2, { stopAt: 11 });
+        if (!cm.live()) return;
+
+        await cm.wait(820);
+        cm.add(`  <span class="cm-bad">${esc(cm.L.fail)}</span>\n\n`);
+        cm.dialog.classList.add("is-bad");
+        await cm.wait(340);
+        cm.add(`<span class="cm-bad">${esc(cm.L.err)}</span>\n`);
+        await cm.wait(260);
+        cm.add(`<span class="cm-note">${esc(cm.L.reason)}</span>\n`);
+        await cm.wait(520);
+      },
+    });
+
+    root.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const value = btn.dataset.copy ?? "";
+        try {
+          await navigator.clipboard.writeText(value);
+          const done = btn.dataset.copiedLabel ?? "OK";
+          const prev = btn.textContent;
+          btn.textContent = done;
+          setTimeout(() => {
+            btn.textContent = prev;
+          }, 1400);
+        } catch {
+          window.prompt(btn.dataset.copyLabel ?? "", value);
+        }
+      });
+    });
+
+    const lightbox = root.querySelector<HTMLDialogElement>("[data-lightbox]");
+    const lightImg = root.querySelector<HTMLImageElement>("[data-lightbox-img]");
+    root.querySelectorAll<HTMLButtonElement>("[data-screen]").forEach((thumb) => {
+      thumb.addEventListener("click", () => {
+        if (!lightbox || !lightImg) return;
+        lightImg.src = thumb.dataset.screen ?? "";
+        lightbox.showModal();
+      });
+    });
+  });
+</script>

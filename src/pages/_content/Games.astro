@@ -1,26 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import GameCard from "../../components/GameCard.astro";
+import Wireghost from "../../components/Wireghost.astro";
 import { useTranslations } from "../../i18n/utils";
 
 const t = useTranslations(Astro.currentLocale);
-
-const games = [
-  {
-    id: "wireghost",
-    title: "Wireghost",
-    tag: t("games.wireghost.tag"),
-    status: t("games.wireghost.status"),
-    description: t("games.wireghost.desc"),
-  },
-  {
-    id: "cuaderno",
-    title: t("games.notebook.title"),
-    tag: t("games.notebook.tag"),
-    status: t("games.notebook.status"),
-    description: t("games.notebook.desc"),
-  },
-];
 ---
 
 <Layout title={t("meta.gamesTitle")} description={t("meta.gamesDesc")}>
@@ -32,17 +16,17 @@ const games = [
     </p>
   </section>
 
-  <section class="mx-auto grid max-w-6xl gap-6 px-5 md:grid-cols-2">
-    {games.map((game) => (
-      <div id={game.id}>
-        <GameCard
-          title={game.title}
-          tag={game.tag}
-          status={game.status}
-          description={game.description}
-          featured={game.id === "wireghost"}
-        />
-      </div>
-    ))}
+  <section class="mx-auto max-w-6xl px-5">
+    <Wireghost />
+  </section>
+
+  <section class="mx-auto max-w-6xl px-5 pt-10" id="cuaderno">
+    <GameCard
+      title={t("games.notebook.title")}
+      tag={t("games.notebook.tag")}
+      status={t("games.notebook.status")}
+      description={t("games.notebook.desc")}
+    />
   </section>
 </Layout>
+

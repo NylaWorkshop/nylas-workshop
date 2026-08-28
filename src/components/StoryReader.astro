@@ -36,6 +36,9 @@ function buildBody(story: StoryRecord) {
       dropDone = true;
     }
 
+    // Los párrafos de diálogo (raya o comillas) llevan sangría francesa.
+    html = html.replace(/<p>(?=[—–«“])/g, '<p class="speech">');
+
     parts.push(`<div class="reader-folio" data-kind="${leaf.kind}">${html}</div>`);
     prevKind = leaf.kind;
   }

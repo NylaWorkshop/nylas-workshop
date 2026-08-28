@@ -8,11 +8,9 @@ order: 1
 
 Rain in this city does not soak you so much as varnish you. Neon drags itself across the asphalt as if looking for somewhere to sit, and you — coffee half-finished, umbrella left at home — take a street that was not there yesterday.
 
-It is in no guidebook. Nor on the GPS. Only a wooden sign, far too old for this district, with a gold paw print you can barely see.
-
 <!-- page -->
 
-![Nyla's Books & Tomes, hidden among neon and rain](/bookstore/nylas_bookstore.png)
+It is in no guidebook. Nor on the GPS. Only a wooden sign, far too old for this district, with a gold paw print you can barely see.
 
 A fantasy bookshop, tucked away among the steel and circuitry.
 
@@ -26,10 +24,6 @@ Behind the counter, a cat in glasses looks at you as if she already knows which 
 
 <!-- page -->
 
-![Nyla, owner of the bookshop](/characters/nyla.jpg)
-
-<!-- page -->
-
 Between the shelves, Elowen is holding a volume she does not remember cataloguing. The cover is dark, the spine has no title, and when she opens it the pages smell of rain that has not fallen yet.
 
 “This wasn't here yesterday,” she whispers.
@@ -37,10 +31,6 @@ Between the shelves, Elowen is holding a volume she does not remember cataloguin
 From the counter, Tsuki turns the metal up a notch.
 
 “Good books turn up when they feel like it.”
-
-<!-- page -->
-
-![Nyla, Tsuki and Elowen in the bookshop](/bookstore/final_staff.png)
 
 <!-- page -->
 
