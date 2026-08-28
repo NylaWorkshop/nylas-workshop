@@ -4,6 +4,7 @@ import path from "node:path";
 import { formatMoney, wireghostFunding } from "../data/wireghost";
 import type { Lang, UiKey } from "../i18n/ui";
 import { useTranslations } from "../i18n/utils";
+import { asset } from "../lib/paths";
 import "../styles/wireghost.css";
 
 const lang = (Astro.currentLocale ?? "es") as Lang;
@@ -13,7 +14,7 @@ const root = path.join(process.cwd(), "public/games/wireghost");
 const coverFile = ["cover.jpg", "cover.png", "cover.webp"].find((name) =>
   fs.existsSync(path.join(root, name)),
 );
-const cover = coverFile ? `/games/wireghost/${coverFile}` : "";
+const cover = coverFile ? asset(`/games/wireghost/${coverFile}`) : "";
 
 const screensDir = path.join(root, "screens");
 const screens = fs.existsSync(screensDir)
@@ -21,7 +22,7 @@ const screens = fs.existsSync(screensDir)
       .readdirSync(screensDir)
       .filter((name) => /\.(png|jpe?g|webp)$/i.test(name))
       .sort()
-      .map((name) => `/games/wireghost/screens/${name}`)
+      .map((name) => asset(`/games/wireghost/screens/${name}`))
   : [];
 
 const { raised, kofiUrl, crypto, goals } = wireghostFunding;

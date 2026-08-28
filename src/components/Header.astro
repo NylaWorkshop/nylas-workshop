@@ -2,6 +2,7 @@
 import LangSwitch from "./LangSwitch.astro";
 import type { Lang } from "../i18n/ui";
 import { localizePath, stripLocale, useTranslations } from "../i18n/utils";
+import { asset } from "../lib/paths";
 
 const lang = (Astro.currentLocale ?? "es") as Lang;
 const t = useTranslations(lang);
@@ -25,7 +26,7 @@ const xProfile = "https://x.com/NylaKatsuki";
     <div class="flex min-w-0 items-center gap-3 sm:gap-4">
       <a href={localizePath(lang, "/")} class="group flex items-center gap-3">
         <img
-          src="/logo.png"
+          src={asset("/logo.png")}
           alt="Nyla's Workshop"
           class="h-12 w-12 rounded-full object-cover ring-1 ring-gold/35 transition group-hover:ring-gold/70"
         />

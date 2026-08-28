@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import StoryReader from "../../components/StoryReader.astro";
 import { getStories } from "../../lib/stories";
 import { useTranslations } from "../../i18n/utils";
+import { asset } from "../../lib/paths";
 
 const t = useTranslations(Astro.currentLocale);
 const stories = getStories(Astro.currentLocale);
@@ -34,4 +35,13 @@ const stories = getStories(Astro.currentLocale);
       spreadOf: t("stories.spreadOf"),
     }}
   />
+
+  <section class="mx-auto max-w-6xl px-5 pb-16 pt-12 md:pt-16">
+    <figure class="stories-plate">
+      <div class="shop-frame shop-frame-stories">
+        <img src={asset("/stories/relato-1.jpg")} alt={t("stories.plateAlt")} loading="lazy" />
+      </div>
+      <figcaption>{t("stories.plateCaption")}</figcaption>
+    </figure>
+  </section>
 </Layout>

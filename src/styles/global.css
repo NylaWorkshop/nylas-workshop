@@ -533,6 +533,26 @@ body::after {
   object-position: center 46%;
 }
 
+/* Lámina de cierre del grimorio: se muestra entera, sin recortar. */
+.stories-plate {
+  width: min(52rem, 100%);
+  margin-inline: auto;
+}
+
+.shop-frame-stories img {
+  aspect-ratio: 1280 / 768;
+  object-position: center center;
+}
+
+.stories-plate figcaption {
+  margin-top: 0.85rem;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
 .album-grid {
   display: grid;
   gap: 1.4rem 1.15rem;

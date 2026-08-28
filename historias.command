@@ -349,9 +349,17 @@ abrir() {
 }
 
 ver_web() {
+  # El sitio se sirve dentro de una subcarpeta (la misma que en GitHub Pages),
+  # así que la dirección se saca de astro.config.mjs en vez de escribirla aquí.
+  local base url
+  base="$(node -e "import('./astro.config.mjs').then(m => console.log(m.default.base || '/'))" 2>/dev/null || true)"
+  [ -z "$base" ] && base="/"
+  case "$base" in */) ;; *) base="$base/" ;; esac
+  url="http://localhost:4321${base}stories/"
+
   if lsof -iTCP:4321 -sTCP:LISTEN >/dev/null 2>&1; then
-    open "http://localhost:4321/stories/" 2>/dev/null || true
-    say "\n${GOLD}✓${OFF} Abriendo http://localhost:4321/stories/"
+    open "$url" 2>/dev/null || true
+    say "\n${GOLD}✓${OFF} Abriendo $url"
   else
     say "\n${DIM}El servidor no está en marcha. Lánzalo con start.command.${OFF}"
     if confirm "¿Lo arranco yo ahora?"; then

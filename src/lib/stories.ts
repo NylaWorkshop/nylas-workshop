@@ -1,3 +1,5 @@
+import { asset } from "./paths";
+
 export type StoryLang = "es" | "en";
 
 export type StoryLeaf = {
@@ -57,7 +59,7 @@ function escapeHtml(text: string) {
 function renderInline(text: string) {
   const placeholders: string[] = [];
   const withImages = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_all, alt, src) => {
-    const img = `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" />`;
+    const img = `<img src="${escapeHtml(asset(src))}" alt="${escapeHtml(alt)}" />`;
     placeholders.push(img);
     return `\u0000${placeholders.length - 1}\u0000`;
   });
@@ -136,7 +138,7 @@ function loadStories(): StoryRecord[] {
       title: meta.title ?? id.slug,
       kicker: meta.kicker ?? "",
       blurb: meta.blurb ?? "",
-      cover: meta.cover || undefined,
+      cover: meta.cover ? asset(meta.cover) : undefined,
       order: Number(meta.order ?? 0) || 0,
       pages,
     });

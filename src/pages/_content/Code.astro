@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { useTranslations } from "../../i18n/utils";
+import { asset } from "../../lib/paths";
 
 const t = useTranslations(Astro.currentLocale);
 const xDm = "https://x.com/messages/compose?recipient_id=1928211827449581568";
@@ -52,7 +53,7 @@ const steps = [
     </div>
 
     <figure class="desk-frame">
-      <img src="/code/nyla-desk.jpg" alt={t("code.imageAlt")} />
+      <img src={asset("/code/nyla-desk.jpg")} alt={t("code.imageAlt")} />
       <figcaption class="desk-caption">{t("code.heroMark")}</figcaption>
     </figure>
   </section>

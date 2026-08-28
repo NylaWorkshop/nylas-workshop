@@ -2,6 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { formatPrice, shopProducts, shopUrl } from "../../data/shop";
 import { useTranslations } from "../../i18n/utils";
+import { asset } from "../../lib/paths";
 
 const t = useTranslations(Astro.currentLocale);
 const lang = Astro.currentLocale ?? "es";
@@ -20,7 +21,7 @@ const lang = Astro.currentLocale ?? "es";
     {shopProducts.map((item) => (
       <a class="shop-card" href={item.href} target="_blank" rel="noopener noreferrer">
         <span class="shop-card-media">
-          <img src={item.image} alt={item.title} />
+          <img src={asset(item.image)} alt={item.title} />
         </span>
         <span class="shop-card-body">
           {item.compareAt && (

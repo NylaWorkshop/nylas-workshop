@@ -4,12 +4,6 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 PORT=4321
-URL="http://localhost:${PORT}/"
-LAN_IP="$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || true)"
-LAN_URL=""
-if [[ -n "${LAN_IP}" ]]; then
-  LAN_URL="http://${LAN_IP}:${PORT}/"
-fi
 
 if ! command -v npm >/dev/null 2>&1; then
   echo "No encuentro npm. Instala Node.js: https://nodejs.org"
@@ -19,6 +13,20 @@ fi
 if [[ ! -d node_modules ]]; then
   echo "Instalando dependencias…"
   npm install
+fi
+
+# El sitio publicado vive en una subcarpeta (GitHub Pages), y el servidor local
+# hace lo mismo para que se vea igual aquí que ahí. La ruta sale de
+# astro.config.mjs: cambiándola allí, esto se entera solo.
+BASE="$(node -e "import('./astro.config.mjs').then(m => console.log(m.default.base || '/'))" 2>/dev/null || true)"
+[[ -z "${BASE}" ]] && BASE="/"
+[[ "${BASE}" != */ ]] && BASE="${BASE}/"
+
+URL="http://localhost:${PORT}${BASE}"
+LAN_IP="$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || true)"
+LAN_URL=""
+if [[ -n "${LAN_IP}" ]]; then
+  LAN_URL="http://${LAN_IP}:${PORT}${BASE}"
 fi
 
 if lsof -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then

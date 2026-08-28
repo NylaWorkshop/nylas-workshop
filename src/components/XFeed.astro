@@ -2,6 +2,7 @@
 import { xPosts, xProfile } from "../data/x-feed";
 import type { Lang } from "../i18n/ui";
 import { useTranslations } from "../i18n/utils";
+import { asset } from "../lib/paths";
 
 const lang = (Astro.currentLocale ?? "es") as Lang;
 const t = useTranslations(lang);
@@ -28,7 +29,7 @@ const dateFmt = new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "es", {
       class="mt-4 inline-flex items-center gap-3 text-cream transition hover:text-gold"
     >
       <img
-        src={xProfile.avatar}
+        src={asset(xProfile.avatar)}
         alt=""
         class="h-9 w-9 rounded-full object-cover ring-1 ring-gold/35"
       />
@@ -49,7 +50,7 @@ const dateFmt = new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "es", {
         rel="noopener noreferrer"
       >
         {post.image && (
-          <img class="x-post-image" src={post.image} alt="" />
+          <img class="x-post-image" src={asset(post.image)} alt="" />
         )}
         <div class="x-post-body">
           <p class="x-post-meta">

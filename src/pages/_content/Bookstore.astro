@@ -5,6 +5,7 @@ import Filigree from "../../components/Filigree.astro";
 import type { Lang } from "../../i18n/ui";
 import { useTranslations } from "../../i18n/utils";
 import { characters, localizeCharacter } from "../../data/characters";
+import { asset } from "../../lib/paths";
 
 const lang = (Astro.currentLocale ?? "es") as Lang;
 const t = useTranslations(lang);
@@ -32,7 +33,7 @@ const story = [
     </div>
 
     <figure class="shop-frame">
-      <img src="/bookstore/nylas_bookstore.png" alt={t("bookstore.imageAlt")} />
+      <img src={asset("/bookstore/nylas_bookstore.png")} alt={t("bookstore.imageAlt")} />
     </figure>
 
     <div class="story-panel">
@@ -94,7 +95,7 @@ const story = [
     </div>
 
     <figure class="shop-frame shop-frame-staff mt-10">
-      <img src="/bookstore/final_staff.png" alt={t("bookstore.closeImageAlt")} />
+      <img src={asset("/bookstore/final_staff.png")} alt={t("bookstore.closeImageAlt")} />
     </figure>
   </section>
 </Layout>
