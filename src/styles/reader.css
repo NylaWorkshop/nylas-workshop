@@ -8,12 +8,21 @@
   --reader-col: min(100%, 44rem);
   --reader-wide: min(100%, 54rem);  /* láminas y encabezados, algo más anchos */
   --reader-top: 4.55rem;            /* alto de la cabecera pegajosa del sitio */
+
+  /* El tomo abierto quiere más ancho que una sola columna de prosa: son dos. */
+  --book-max: min(100%, 60rem);
+  --book-gutter: clamp(1.8rem, 5vw, 4rem);  /* el lomo entre página y página */
+  /* Alto de la doble página: lo que cabe en pantalla descontando cabecera,
+     barra de avance y los botones de pasar hoja. Con suelo y techo para que
+     ni se quede en un sello ni obligue a barrer la pantalla entera. */
+  --book-h: clamp(24rem, calc(100svh - 17rem), 42rem);
 }
 
 @media (min-width: 1280px) {
   .reader {
     --reader-col: min(100%, 48rem);
     --reader-wide: min(100%, 58rem);
+    --book-max: min(100%, 68rem);
   }
 }
 
@@ -300,6 +309,179 @@
 }
 
 /* ------------------------------------------------------- La prosa ------- */
+
+/* El tomo abierto: dos columnas de altura fija. El texto que no cabe sigue
+   maquetado en columnas fuera del recuadro, y pasar de hoja es mover el scroll
+   horizontal exactamente un par de columnas (ver StoryReader.astro). */
+.reader-book {
+  position: relative;
+  max-width: var(--book-max);
+  margin: 2.6rem auto 0;
+  padding: 0 clamp(0.6rem, 2vw, 1.6rem);
+  background:
+    linear-gradient(180deg, rgba(232, 201, 122, 0.05), transparent 30%),
+    var(--bg-card);
+  border: 1px solid rgba(232, 201, 122, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(10, 10, 11, 0.8) inset,
+    0 18px 44px rgba(0, 0, 0, 0.32);
+}
+
+/* Sube de especificidad a propósito: gana a .reader-prose, que comparte
+   elemento y traería el ancho y los márgenes de la lectura en vertical. */
+.reader-book .reader-spread {
+  height: var(--book-h);
+  columns: 2;
+  column-gap: var(--book-gutter);
+  column-fill: auto;
+  /* Scroll oculto: las hojas se pasan desde el script, nunca con la rueda. */
+  overflow: hidden;
+  overscroll-behavior: contain;
+  padding: clamp(1.4rem, 3vw, 2.4rem) 0;
+  max-width: none;
+  margin: 0;
+  /* Renglones más cortos que en una sola columna: el cuerpo baja un punto. */
+  font-size: clamp(1.05rem, 0.94rem + 0.3vw, 1.22rem);
+  line-height: 1.75;
+}
+
+/* Dentro del tomo mandan las columnas, no los anchos de la lectura larga. */
+.reader-book .reader-folio[data-kind="text"] {
+  max-width: none;
+}
+
+.reader-book .reader-folio[data-kind="plate"] img {
+  max-height: calc(var(--book-h) * 0.62);
+}
+
+.reader-book .reader-folio[data-kind="plate"] figure,
+.reader-book .reader-prose figure {
+  margin: 1.4rem 0;
+}
+
+.reader-book .reader-spread:focus-visible {
+  outline: 1px solid rgba(240, 215, 140, 0.55);
+  outline-offset: 0.35rem;
+}
+
+/* El lomo entre las dos páginas. */
+.reader-spine {
+  position: absolute;
+  top: clamp(1.4rem, 3vw, 2.4rem);
+  bottom: clamp(1.4rem, 3vw, 2.4rem);
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(232, 201, 122, 0.28) 18%,
+    rgba(232, 201, 122, 0.28) 82%,
+    transparent
+  );
+}
+
+/* Nada de párrafos partidos por la mitad del lomo si se puede evitar. */
+.reader-spread p {
+  orphans: 2;
+  widows: 2;
+}
+
+.reader-spread figure,
+.reader-spread .reader-break {
+  break-inside: avoid;
+}
+
+.reader-spread .reader-break {
+  margin: 1.7rem auto;
+}
+
+.reader-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.8rem, 3vw, 2rem);
+  max-width: var(--reader-wide);
+  margin: 1.3rem auto 0;
+}
+
+.reader-turn {
+  flex: 0 0 auto;
+  padding: 0.5rem 1.1rem;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  background: transparent;
+  border: 1px solid rgba(232, 201, 122, 0.35);
+  cursor: pointer;
+  transition:
+    border-color 0.24s ease,
+    color 0.24s ease,
+    box-shadow 0.24s ease;
+}
+
+/* El letter-spacing del botón se come el hueco tras el chevron. */
+.reader-turn span {
+  display: inline-block;
+  margin: 0 0.15em;
+}
+
+.reader-turn:hover:not(:disabled),
+.reader-turn:focus-visible {
+  border-color: rgba(240, 215, 140, 0.75);
+  color: var(--cream);
+  box-shadow: 0 0 18px var(--glow);
+  outline: none;
+}
+
+.reader-turn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.reader-folionum {
+  flex: 0 0 auto;
+  min-width: 9ch;
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(163, 158, 147, 0.85);
+}
+
+/* Por debajo de esto, dos columnas dejan renglones de unas 25 letras: ilegible.
+   El tomo se queda en una sola página y se pasa hoja igual. */
+@media (max-width: 860px) {
+  .reader-book .reader-spread {
+    columns: 1;
+  }
+
+  .reader-spine {
+    display: none;
+  }
+}
+
+/* En móvil los dos botones y el folio no caben con el tracking de escritorio. */
+@media (max-width: 520px) {
+  .reader-nav {
+    gap: 0.5rem;
+  }
+
+  .reader-turn {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+  }
+
+  .reader-folionum {
+    min-width: 0;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+  }
+}
 
 .reader-prose {
   max-width: var(--reader-wide);

@@ -36,6 +36,6 @@ export const albums: Album[] = [
   {
     id: "ankh",
     image: "/reaper-codex/albums/06.png",
-    title: "",
+    title: "Reaper Codex",
   },
 ];
