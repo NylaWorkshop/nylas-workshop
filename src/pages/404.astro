@@ -1,0 +1,43 @@
+---
+// GitHub Pages sirve este archivo para cualquier dirección que no exista, sin
+// pasar por el enrutado de Astro: no hay forma de saber el idioma del visitante,
+// así que la puerta cerrada se escribe en los dos.
+import Layout from "../layouts/Layout.astro";
+import { asset } from "../lib/paths";
+---
+
+<Layout
+  title="Esa puerta no existe"
+  description="La dirección que buscabas no está en el taller."
+>
+  <section class="mx-auto flex max-w-2xl flex-col items-center px-5 pb-24 pt-20 text-center">
+    <p class="banner-title">404</p>
+
+    <h1 class="font-display gold-text mt-4 text-3xl md:text-4xl">
+      Esa puerta no existe
+    </h1>
+    <p class="mt-4 text-base text-muted">
+      O la calle cambió de sitio, que en esta ciudad pasa. Vuelve al taller y
+      entra por la de siempre.
+    </p>
+
+    <div class="flourish mt-10 w-full max-w-xs" aria-hidden="true">
+      <span class="flourish-line"></span>
+      <span class="text-gold">✦</span>
+      <span class="flourish-line"></span>
+    </div>
+
+    <h2 class="font-display gold-text mt-10 text-2xl md:text-3xl" lang="en">
+      That door isn't here
+    </h2>
+    <p class="mt-4 text-base text-muted" lang="en">
+      Or the street moved, which happens in this city. Head back to the
+      workshop and come in the usual way.
+    </p>
+
+    <div class="mt-12 flex flex-wrap items-center justify-center gap-4">
+      <a class="btn-gold-outline" href={asset("/")}>Volver al taller</a>
+      <a class="btn-gold-outline" href={asset("/en/")} lang="en">Back to the workshop</a>
+    </div>
+  </section>
+</Layout>
