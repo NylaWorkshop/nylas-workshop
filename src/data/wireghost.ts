@@ -11,6 +11,9 @@ export type FundingGoal = {
   amount: number;
 };
 
+/** Página del juego en itch.io: a donde lleva el botón de JUGAR. */
+export const wireghostPlayUrl = "https://nylaworkshop.itch.io/wireghost";
+
 export const wireghostFunding = {
   /** Lo recaudado hasta ahora. Actualízalo cuando entren donaciones. */
   raised: 0,

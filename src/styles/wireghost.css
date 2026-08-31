@@ -476,7 +476,13 @@
   margin-top: 1.15rem;
 }
 
-.wg-cm-btns button {
+/* El botón de abrir la partida es un enlace de verdad, así que comparte
+   estilo con los botones de la ventana. */
+.wg-cm-btns button,
+.wg-cm-btns a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 1;
   padding: 0.65rem 0.5rem;
   border: 1px solid rgba(232, 201, 122, 0.2);
@@ -485,6 +491,8 @@
   font-family: var(--font-display);
   font-size: 0.66rem;
   letter-spacing: 0.14em;
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
   transition: 0.14s;
 }

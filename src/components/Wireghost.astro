@@ -1,7 +1,7 @@
 ---
 import fs from "node:fs";
 import path from "node:path";
-import { formatMoney, wireghostFunding } from "../data/wireghost";
+import { formatMoney, wireghostFunding, wireghostPlayUrl } from "../data/wireghost";
 import type { Lang, UiKey } from "../i18n/ui";
 import { useTranslations } from "../i18n/utils";
 import { asset } from "../lib/paths";
@@ -77,16 +77,18 @@ const commsLabels = {
   ready: t("games.wireghost.cm.ready"),
 };
 
-const downloadLabels = {
+const playLabels = {
   ok: t("games.wireghost.cm.ok"),
   hop: t("games.wireghost.cm.hop"),
   head: t("games.wireghost.dl.head"),
   auth: t("games.wireghost.dl.auth"),
   mirror: t("games.wireghost.dl.mirror"),
   fetch: t("games.wireghost.dl.fetch"),
-  fail: t("games.wireghost.dl.fail"),
-  err: t("games.wireghost.dl.err"),
-  reason: t("games.wireghost.dl.reason"),
+  build: t("games.wireghost.dl.build"),
+  boot: t("games.wireghost.dl.boot"),
+  ready: t("games.wireghost.dl.ready"),
+  handoff: t("games.wireghost.dl.handoff"),
+  blocked: t("games.wireghost.dl.blocked"),
 };
 ---
 
@@ -116,8 +118,8 @@ const downloadLabels = {
         <button class="btn-gold" type="button" data-donate-open>
           {t("games.wireghost.donate")}
         </button>
-        <button class="wg-hack" type="button" data-download-open aria-label={t("games.wireghost.dl.aria")}>
-          <span class="wg-hack-file">{t("games.wireghost.download")}</span>
+        <button class="wg-hack" type="button" data-play-open aria-label={t("games.wireghost.dl.aria")}>
+          <span class="wg-hack-file">{t("games.wireghost.play")}</span>
         </button>
       </div>
     </div>
@@ -230,11 +232,11 @@ const downloadLabels = {
     <script type="application/json" data-cm-i18n set:html={JSON.stringify(commsLabels)} />
   </dialog>
 
-  <dialog class="wg-dialog wg-cm wg-cm-dl" data-download-dialog>
+  <dialog class="wg-dialog wg-cm wg-cm-dl" data-play-dialog data-play-url={wireghostPlayUrl}>
     <div class="wg-cm-bar">
       <span class="wg-cm-dot" aria-hidden="true"></span>
       <span class="wg-cm-tag">{t("games.wireghost.dl.tag")}</span>
-      <button class="wg-cm-x" type="button" data-download-close aria-label={t("games.wireghost.close")}>×</button>
+      <button class="wg-cm-x" type="button" data-play-close aria-label={t("games.wireghost.close")}>×</button>
     </div>
 
     <div class="wg-cm-ask" data-cm-ask>
@@ -243,7 +245,7 @@ const downloadLabels = {
       <p class="wg-cm-warn">{t("games.wireghost.dl.warn")}</p>
       <div class="wg-cm-btns">
         <button class="wg-cm-yes" type="button" data-cm-yes>{t("games.wireghost.dl.yes")}</button>
-        <button class="wg-cm-no" type="button" data-download-close>{t("games.wireghost.cm.no")}</button>
+        <button class="wg-cm-no" type="button" data-play-close>{t("games.wireghost.cm.no")}</button>
       </div>
     </div>
 
@@ -254,11 +256,20 @@ const downloadLabels = {
       <p class="wg-cm-soon-title">{t("games.wireghost.dl.noteTitle")}</p>
       <p class="wg-cm-soon">{t("games.wireghost.dl.note")}</p>
       <div class="wg-cm-btns">
-        <button class="wg-cm-no" type="button" data-download-close>{t("games.wireghost.dl.back")}</button>
+        <a
+          class="wg-cm-yes"
+          href={wireghostPlayUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-play-link
+        >
+          {t("games.wireghost.dl.play")}
+        </a>
+        <button class="wg-cm-no" type="button" data-play-close>{t("games.wireghost.dl.back")}</button>
       </div>
     </div>
 
-    <script type="application/json" data-dl-i18n set:html={JSON.stringify(downloadLabels)} />
+    <script type="application/json" data-dl-i18n set:html={JSON.stringify(playLabels)} />
   </dialog>
 
   <dialog class="wg-lightbox" data-lightbox>
@@ -279,7 +290,7 @@ const downloadLabels = {
     add: (html: string) => void;
     wait: (ms: number) => Promise<unknown>;
     dots: (label: string, count: number, iv: number) => Promise<void>;
-    hop: (index: number, total: number, opts?: { stopAt?: number }) => Promise<void>;
+    hop: (index: number, total: number) => Promise<void>;
     fingerprint: () => string;
   };
 
@@ -300,7 +311,7 @@ const downloadLabels = {
   /* =====================================================================
      CANAL SEGURO. Motor de las ventanas de conexión, calcado del comms.js
      de Wireghost: la misma coreografía sirve para el canal de donación y
-     para el de descarga, cada uno con sus etiquetas y su guion.
+     para el de partida, cada uno con sus etiquetas y su guion.
      ===================================================================== */
   function wireChannel(opts: {
     dialog: HTMLDialogElement | null;
@@ -383,24 +394,21 @@ const downloadLabels = {
 
       const chain = RELAYS.slice().sort(() => Math.random() - 0.5);
 
-      /* Un rebote. Con stopAt la barra se queda a medias: el que llama
-         remata la línea (así es como se cuelga la descarga). */
-      async function hop(index: number, total: number, hopOpts?: { stopAt?: number }) {
-        const stopAt = hopOpts?.stopAt ?? BAR_WIDTH;
+      /* Un rebote: la barra se llena y la línea remata con la latencia. */
+      async function hop(index: number, total: number) {
         const name = index === total - 1 ? "????-relay-??" : chain[index % chain.length];
         const label = L.hop
           .replace("{i}", String(index + 1))
           .replace("{n}", String(total))
           .replace("{name}", name);
         const base = log.innerHTML;
-        for (let step = 0; step <= stopAt; step++) {
+        for (let step = 0; step <= BAR_WIDTH; step++) {
           if (!live()) return;
           log.innerHTML =
             base +
             `<span class="cm-lbl">${esc(label)}</span>[<span class="cm-bar">${"█".repeat(step)}</span>${"░".repeat(BAR_WIDTH - step)}]`;
           await wait(26);
         }
-        if (stopAt < BAR_WIDTH) return;
         log.innerHTML += `  <span class="cm-ms">${9 + Math.floor(Math.random() * 90)} ms</span>\n`;
         log.scrollTop = log.scrollHeight;
         await wait(90);
@@ -473,12 +481,15 @@ const downloadLabels = {
       },
     });
 
-    /* --- descarga: la build todavía no existe, así que el enlace revienta
-           a mitad del segundo rebote (el C.fail del juego) -------------- */
+    /* --- jugar: el canal se establece y la partida se traspasa a itch.io
+           en una pestaña nueva ------------------------------------------ */
+    const playDialog = root.querySelector<HTMLDialogElement>("[data-play-dialog]");
+    const playUrl = playDialog?.dataset.playUrl ?? "";
+
     wireChannel({
-      dialog: root.querySelector<HTMLDialogElement>("[data-download-dialog]"),
-      openBtn: root.querySelector("[data-download-open]"),
-      closeSel: "[data-download-close]",
+      dialog: playDialog,
+      openBtn: root.querySelector("[data-play-open]"),
+      closeSel: "[data-play-close]",
       labelsSel: "[data-dl-i18n]",
       panelSel: "[data-cm-done]",
       run: async (cm) => {
@@ -489,18 +500,29 @@ const downloadLabels = {
         await cm.dots(cm.L.mirror, 5, 62);
         if (!cm.live()) return;
 
-        /* El primer rebote entra; el segundo se queda colgado a media barra. */
-        await cm.hop(0, 2);
-        await cm.hop(1, 2, { stopAt: 11 });
+        for (let i = 0; i < 3; i++) await cm.hop(i, 3);
         if (!cm.live()) return;
 
-        await cm.wait(820);
-        cm.add(`  <span class="cm-bad">${esc(cm.L.fail)}</span>\n\n`);
-        cm.dialog.classList.add("is-bad");
-        await cm.wait(340);
-        cm.add(`<span class="cm-bad">${esc(cm.L.err)}</span>\n`);
-        await cm.wait(260);
-        cm.add(`<span class="cm-note">${esc(cm.L.reason)}</span>\n`);
+        cm.add(`\n<span class="cm-dim">${esc(cm.L.build)} SHA256:${cm.fingerprint()}</span>\n`);
+        await cm.wait(220);
+        await cm.dots(cm.L.boot, 4, 70);
+        await cm.wait(160);
+        if (!cm.live()) return;
+
+        cm.add(`\n<span class="cm-done">${esc(cm.L.ready)}</span>\n`);
+        await cm.wait(420);
+        if (!cm.live()) return;
+
+        /* El traspaso ocurre lejos del clic original, así que algún navegador
+           puede bloquear la pestaña: en ese caso lo decimos y queda el enlace
+           del panel para abrirla a mano. */
+        const win = playUrl ? window.open(playUrl, "_blank") : null;
+        if (win) {
+          win.opener = null;
+          cm.add(`<span class="cm-note">${esc(cm.L.handoff)}</span>\n`);
+        } else {
+          cm.add(`<span class="cm-bad">${esc(cm.L.blocked)}</span>\n`);
+        }
         await cm.wait(520);
       },
     });
