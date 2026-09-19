@@ -16,7 +16,7 @@ export const wireghostPlayUrl = "https://nylaworkshop.itch.io/wireghost";
 
 export const wireghostFunding = {
   /** Lo recaudado hasta ahora. Actualízalo cuando entren donaciones. */
-  raised: 0,
+  raised: 73.6,
   currency: "EUR",
   kofiUrl,
   crypto: [
@@ -31,9 +31,11 @@ export const wireghostFunding = {
 };
 
 export function formatMoney(amount: number, lang: string) {
+  const hasCents = Math.round(amount * 100) % 100 !== 0;
   return new Intl.NumberFormat(lang === "en" ? "en-GB" : "es-ES", {
     style: "currency",
     currency: wireghostFunding.currency,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: hasCents ? 2 : 0,
   }).format(amount);
 }
